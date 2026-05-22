@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:macro name="leg_transmission" params="prefix use_simulation mechanical_reduction front_offset back_offset second_leg_pitch_offset l1 l2 l5">
+        <xacro:if value="${use_simulation}">
+            <transmission name="${prefix}_front_first_leg_joint_trans">
+                <type>transmission_interface/SimpleTransmission</type>
+                <actuator name="${prefix}_front_first_joint_motor">
+                    <mechanicalReduction>${mechanical_reduction}</mechanicalReduction>
+                </actuator>
+                <joint name="${prefix}_front_first_leg_joint">
+                    <offset>0.</offset>
+                    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+                </joint>
+            </transmission>
+            <transmission name="${prefix}_back_first_leg_joint_trans">
+                <type>transmission_interface/SimpleTransmission</type>
+                <actuator name="${prefix}_back_first_joint_motor">
+                    <mechanicalReduction>${mechanical_reduction}</mechanicalReduction>
+                </actuator>
+                <joint name="${prefix}_back_first_leg_joint">
+                    <offset>0.</offset>
+                    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+                </joint>
+            </transmission>
+            <transmission name="${prefix}_front_second_leg_joint_trans">
+                <type>transmission_interface/SimpleTransmission</type>
+                <actuator name="${prefix}_front_second_leg_joint_motor">
+                    <mechanicalReduction>${mechanical_reduction}</mechanicalReduction>
+                </actuator>
+                <joint name="${prefix}_front_second_leg_joint">
+                    <offset>0.</offset>
+                    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+                </joint>
+            </transmission>
+            <transmission name="${prefix}_back_second_leg_joint_trans">
+                <type>transmission_interface/SimpleTransmission</type>
+                <actuator name="${prefix}_back_second_leg_joint_motor">
+                    <mechanicalReduction>${mechanical_reduction}</mechanicalReduction>
+                </actuator>
+                <joint name="${prefix}_back_second_leg_joint">
+                    <offset>0.</offset>
+                    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+                </joint>
+            </transmission>
+        </xacro:if>
+        <xacro:unless value="${use_simulation}">
+            <transmission name="${prefix}_leg_trans">
+                <type>transmission_interface/FiveLinkTransmission</type>
+                <actuator name="${prefix}_back_leg_joint_motor">
+                    <mechanicalReduction>${mechanical_reduction}</mechanicalReduction>
+                    <offset>${back_offset}</offset>
+                    <l1>${l1}</l1>
+                    <l2>${l2}</l2>
+                    <l5>${l5}</l5>
+                </actuator>
+                <actuator name="${prefix}_front_leg_joint_motor">
+                    <mechanicalReduction>${mechanical_reduction}</mechanicalReduction>
+                    <offset>${front_offset}</offset>
+                    <l1>${l1}</l1>
+                    <l2>${l2}</l2>
+                    <l5>${l5}</l5>
+                </actuator>
+                <joint name="${prefix}_back_first_leg_joint">
+                    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+                </joint>
+                <joint name="${prefix}_front_first_leg_joint">
+                    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+                </joint>
+                <joint name="${prefix}_back_second_leg_joint">
+                    <pitch_offset>-${second_leg_pitch_offset}</pitch_offset>
+                    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+                </joint>
+                <joint name="${prefix}_front_second_leg_joint">
+                    <pitch_offset>${second_leg_pitch_offset}</pitch_offset>
+                    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+                </joint>
+            </transmission>
+        </xacro:unless>
+
+    </xacro:macro>
+
+</robot>

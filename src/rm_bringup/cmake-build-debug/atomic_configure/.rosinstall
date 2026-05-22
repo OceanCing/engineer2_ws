@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/ch/rm_ws/src/rm_bringup/cmake-build-debug/devel/setup.sh

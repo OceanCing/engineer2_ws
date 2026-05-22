@@ -1,0 +1,4 @@
+rm_bringup
+/home/dynamicx/engineer2_ws/devel/.private/rm_bringup/lib/pkgconfig/rm_bringup.pc /home/dynamicx/engineer2_ws/devel/lib/pkgconfig/rm_bringup.pc
+/home/dynamicx/engineer2_ws/devel/.private/rm_bringup/share/rm_bringup/cmake/rm_bringupConfig.cmake /home/dynamicx/engineer2_ws/devel/share/rm_bringup/cmake/rm_bringupConfig.cmake
+/home/dynamicx/engineer2_ws/devel/.private/rm_bringup/share/rm_bringup/cmake/rm_bringupConfig-version.cmake /home/dynamicx/engineer2_ws/devel/share/rm_bringup/cmake/rm_bringupConfig-version.cmake

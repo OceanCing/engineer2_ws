@@ -1,0 +1,137 @@
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:property name="max_hip_effort" value="50"/>
+    <xacro:property name="max_knee_effort" value="50"/>
+    <xacro:property name="max_velocity" value="50.0"/>
+    <xacro:property name="hip_upper_limit" value="2.26"/>
+    <xacro:property name="hip_lower_limit" value="0.1742"/>
+    <xacro:property name="knee_upper_limit" value="-0.1"/>
+    <xacro:property name="knee_lower_limit" value="-3.05"/>
+
+    <xacro:macro name="thigh"
+                 params="prefix connected_to pitch_offset leg_x_offset leg_y_offset leg_z_offset mechanical_reduction">
+        <link name="${prefix}_thigh">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 -3.14 0"/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/legged_balance/first_leg.stl"/>
+                </geometry>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="0.01 0.01 0.01"/>
+                </geometry>
+            </collision>
+            <inertial>
+                <mass value="0.144"/>
+                <origin xyz="-0.0 -0.0 -0.064"/>
+                <inertia ixx="4.261e-4" ixy="0" ixz="2.897e-6" iyy="4.502e-4" iyz="0"
+                         izz="2.9292e-5"/>
+            </inertial>
+        </link>
+
+        <joint name="${prefix}_hip_joint" type="revolute">
+            <axis xyz="0 1 0"/>
+            <origin xyz="${leg_x_offset} ${leg_y_offset} ${leg_z_offset}" rpy="0 0 0"/>
+            <parent link="${connected_to}"/>
+            <child link="${prefix}_thigh"/>
+            <limit effort="${max_hip_effort}" velocity="${max_velocity}" lower="${hip_lower_limit}"
+                   upper="${hip_upper_limit}"/>
+            <!--            <safety_controller k_position="100" k_velocity="1"-->
+            <!--                               soft_lower_limit="${hip_lower_limit + 0.05}"-->
+            <!--                               soft_upper_limit="${hip_upper_limit - 0.05}"/>-->
+        </joint>
+
+    </xacro:macro>
+
+    <xacro:macro name="shank"
+                 params="prefix connected_to pitch_offset leg_x_offset leg_y_offset leg_z_offset mechanical_reduction">
+        <link name="${prefix}_shank">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/legged_balance/second_leg.stl"/>
+                </geometry>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0.0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="0.01 0.01 0.01"/>
+                </geometry>
+            </collision>
+            <inertial>
+                <mass value="0.451"/>
+                <origin xyz="0.0 -0.007386 -0.177365"/>
+                <inertia ixx="4.251e-3" ixy="2.83e-7" ixz="5.237e-6" iyy="4.279e-3" iyz="-2.428e-4"
+                         izz="2.143e-4"/>
+            </inertial>
+        </link>
+
+        <joint name="${prefix}_knee_joint" type="revolute">
+            <axis xyz="0 1 0"/>
+            <origin xyz="${leg_x_offset} ${leg_y_offset} ${leg_z_offset}" rpy="0 0 0"/>
+            <parent link="${connected_to}"/>
+            <child link="${prefix}_shank"/>
+            <limit effort="${max_knee_effort}" velocity="${max_velocity}" lower="${knee_lower_limit}"
+                   upper="${knee_upper_limit}"/>
+            <!--            <safety_controller k_position="100" k_velocity="1"-->
+            <!--                               soft_lower_limit="${knee_lower_limit}"-->
+            <!--                               soft_upper_limit="${knee_upper_limit}"/>-->
+        </joint>
+
+    </xacro:macro>
+
+    <xacro:macro name="leg_transmission"
+                 params="prefix use_simulation mechanical_reduction front_offset back_offset l1 l2 l5">
+        <xacro:if value="${use_simulation}">
+            <transmission name="${prefix}_hip_joint_trans">
+                <type>transmission_interface/SimpleTransmission</type>
+                <actuator name="${prefix}_hip_joint_motor">
+                    <mechanicalReduction>${mechanical_reduction}</mechanicalReduction>
+                </actuator>
+                <joint name="${prefix}_hip_joint">
+                    <offset>0.</offset>
+                    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+                </joint>
+            </transmission>
+            <transmission name="${prefix}_knee_joint_trans">
+                <type>transmission_interface/SimpleTransmission</type>
+                <actuator name="${prefix}_knee_joint_motor">
+                    <mechanicalReduction>${mechanical_reduction}</mechanicalReduction>
+                </actuator>
+                <joint name="${prefix}_knee_joint">
+                    <offset>0.</offset>
+                    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+                </joint>
+            </transmission>
+        </xacro:if>
+        <xacro:unless value="${use_simulation}">
+            <transmission name="${prefix}_leg_trans">
+                <type>transmission_interface/FiveLinkTransmission</type>
+                <actuator name="${prefix}_back_leg_joint_motor">
+                    <mechanicalReduction>${mechanical_reduction}</mechanicalReduction>
+                    <offset>${back_offset}</offset>
+                    <l1>${l1}</l1>
+                    <l2>${l2}</l2>
+                    <l5>${l5}</l5>
+                </actuator>
+                <actuator name="${prefix}_front_leg_joint_motor">
+                    <mechanicalReduction>${mechanical_reduction}</mechanicalReduction>
+                    <offset>${front_offset}</offset>
+                    <l1>${l1}</l1>
+                    <l2>${l2}</l2>
+                    <l5>${l5}</l5>
+                </actuator>
+                <joint name="${prefix}_hip_joint">
+                    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+                </joint>
+                <joint name="${prefix}_knee_joint">
+                    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+                </joint>
+            </transmission>
+        </xacro:unless>
+
+    </xacro:macro>
+
+</robot>

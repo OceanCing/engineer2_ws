@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+
+<package format="2">
+    <name>ecat_manager</name>
+    <version>1.0.1</version>
+    <description>Core C++ library to interface one or multiple drives. Contains abstract base classes for the
+        communication interface.
+    </description>
+
+    <license>GPLv3</license>
+    <author email="liaoqiayuan@gmail.com">Qiayuan Liao</author>
+    <maintainer email="liaoqiayuan@gmail.com">Qiayuan Liao</maintainer>
+    <url type="website">https://github.com/qiayuanl/ecat_manager</url>
+
+    <buildtool_depend>catkin</buildtool_depend>
+
+    <depend>soem_interface_rsl</depend>
+    <depend>any_worker</depend>
+    <depend>signal_handler</depend>
+
+    <depend>cleardrive_foc</depend>
+    <depend>cleardrive_imu</depend>
+    <depend>rm_ecat_mit</depend>
+    <depend>rm_ecat_standard_slave</depend>
+
+</package>

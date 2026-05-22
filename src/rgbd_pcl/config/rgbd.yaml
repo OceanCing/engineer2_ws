@@ -1,0 +1,10 @@
+#gemini_336l:
+  camera_name: "gemini_336l"
+  ir_info_uri: "/home/hiling/.ros/camera_info/gemini_336l_color.yaml"
+  color_info_uri: "/home/hiling/.ros/camera_info/gemini_336l_color.yaml"
+  depth_fps: 10
+  point_cloud_decimation_filter_factor: 8
+  enable_decimation_filter: true
+  enable_threshold_filter: true
+  threshold_filter_max: 1000
+  threshold_filter_min: 0

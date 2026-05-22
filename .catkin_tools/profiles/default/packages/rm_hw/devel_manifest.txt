@@ -1,0 +1,6 @@
+rm_control/rm_hw
+/home/dynamicx/engineer2_ws/devel/.private/rm_hw/lib/librm_hw_loader_plugins.so /home/dynamicx/engineer2_ws/devel/lib/librm_hw_loader_plugins.so
+/home/dynamicx/engineer2_ws/devel/.private/rm_hw/lib/rm_hw/rm_hw /home/dynamicx/engineer2_ws/devel/lib/rm_hw/rm_hw
+/home/dynamicx/engineer2_ws/devel/.private/rm_hw/lib/pkgconfig/rm_hw.pc /home/dynamicx/engineer2_ws/devel/lib/pkgconfig/rm_hw.pc
+/home/dynamicx/engineer2_ws/devel/.private/rm_hw/share/rm_hw/cmake/rm_hwConfig.cmake /home/dynamicx/engineer2_ws/devel/share/rm_hw/cmake/rm_hwConfig.cmake
+/home/dynamicx/engineer2_ws/devel/.private/rm_hw/share/rm_hw/cmake/rm_hwConfig-version.cmake /home/dynamicx/engineer2_ws/devel/share/rm_hw/cmake/rm_hwConfig-version.cmake

@@ -1,0 +1,12 @@
+time stamp
+
+uint32 statusword
+
+string[] names
+bool[] isOnline
+bool[] isOverTemperature
+
+float64[] position
+float64[] velocity
+float64[] torque
+float64[] temperature

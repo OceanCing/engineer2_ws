@@ -1,0 +1,18 @@
+<launch>
+    <arg name="imu_trigger" default="false"/>
+    <arg name="manager_name" default="VisionExchangerNodelet"/>
+    <arg name="camera_class" default="HKCameraNodelet"/>
+    <arg name="camera_type" default="hk_camera"/>
+    <arg name="camera_frame" default="camera_optical_frame"/>
+    <arg name="hw_name" default="rm_ecat_hw" doc="[rm_ecat_hw, rm_hw]"/>
+
+<!--     <node pkg="nodelet" type="nodelet" name="VisionExchangerNodelet" args="manager" output="screen" respawn="true"/> -->
+    <rosparam file="$(find rgbd_pcl)/config/camera.yaml" command="load"/>
+    <node pkg="nodelet" type="nodelet" name="$(arg camera_type)"
+          args="load $(arg camera_type)/$(arg camera_class) $(arg manager_name)"
+          output="screen" respawn="true">
+        <param name="camera_frame_id" value="$(arg camera_frame)"/>
+        <param name="enable_imu_trigger" value="$(arg imu_trigger)"/>
+<!--         <remap from="/rm_hw/gimbal_imu/trigger_time" to="/$(arg hw_name)/gimbal_imu/trigger_time"/> -->
+    </node>
+</launch>

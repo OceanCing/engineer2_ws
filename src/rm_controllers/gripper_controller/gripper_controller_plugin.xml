@@ -1,0 +1,10 @@
+<library path="lib/libgripper_controller">
+  <!-- controller_interface types -->
+  <class name="gripper_controller/GripperController"
+         type="gripper_controller::GripperController"
+         base_class_type="controller_interface::ControllerBase">
+    <description>
+      The controller to control engineer gripper to do a effort control grabbing
+    </description>
+  </class>
+</library>

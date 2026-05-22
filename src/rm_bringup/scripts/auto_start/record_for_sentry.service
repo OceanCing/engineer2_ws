@@ -1,0 +1,9 @@
+[Unit]
+Description=record for sentry
+After=rm_ecat_start.service
+[Service]
+User=dynamicx
+Type=simple
+ExecStart=/bin/bash -c "/home/dynamicx/record_for_sentry.sh"
+[Install]
+WantedBy=multi-user.target

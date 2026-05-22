@@ -1,0 +1,9 @@
+[Unit]
+Description=record system log
+After=sys_log_record.service
+[Service]
+User=dynamicx
+Type=simple
+ExecStart=/bin/bash -c "/home/dynamicx/sys_log_record.sh"
+[Install]
+WantedBy=multi-user.target

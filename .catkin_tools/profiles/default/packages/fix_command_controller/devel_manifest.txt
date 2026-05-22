@@ -1,0 +1,5 @@
+rm_controllers/fix_command_controller
+/home/dynamicx/engineer2_ws/devel/.private/fix_command_controller/lib/libfix_command_controller.so /home/dynamicx/engineer2_ws/devel/lib/libfix_command_controller.so
+/home/dynamicx/engineer2_ws/devel/.private/fix_command_controller/lib/pkgconfig/fix_command_controller.pc /home/dynamicx/engineer2_ws/devel/lib/pkgconfig/fix_command_controller.pc
+/home/dynamicx/engineer2_ws/devel/.private/fix_command_controller/share/fix_command_controller/cmake/fix_command_controllerConfig-version.cmake /home/dynamicx/engineer2_ws/devel/share/fix_command_controller/cmake/fix_command_controllerConfig-version.cmake
+/home/dynamicx/engineer2_ws/devel/.private/fix_command_controller/share/fix_command_controller/cmake/fix_command_controllerConfig.cmake /home/dynamicx/engineer2_ws/devel/share/fix_command_controller/cmake/fix_command_controllerConfig.cmake

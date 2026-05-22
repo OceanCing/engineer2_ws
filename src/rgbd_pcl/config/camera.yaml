@@ -1,0 +1,20 @@
+hk_camera:
+  image_width: 1280
+  image_height: 1024
+  pixel_format: bgr8
+  camera_info_url: 'file:///home/dynamicx/.ros/camera_info/side_camera.yaml'
+  camera_name: hk_camera
+  camera_frame_id: camera_optical_frame
+  frame_id: camera_optical_frame
+  camera_sn: KE0220040170
+  frame_rate: 1000
+  exposure_auto: false
+  exposure_value: 500.0
+#  exposure_value: 3500.0
+
+  gamma_selector: 2
+  gamma_value: 0.5
+  enable_imu_trigger: true
+  white_auto: true
+  is_fps_down: true
+  target_fps: 20.0

@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="dart">
+
+    <xacro:include filename="$(find rm_description)/urdf/dart/gimbal.transmission.urdf.xacro"/>
+    <xacro:include filename="$(find rm_description)/urdf/common/friction.urdf.xacro"/>
+    <xacro:include filename="$(find rm_description)/urdf/dart/shooter.transmission.urdf.xacro"/>
+
+    <link name="base_link"/>
+
+    <link name="yaw"/>
+
+    <joint name="yaw_joint" type="revolute">
+        <origin xyz="0 0 0.184"
+                rpy="0 0 0"/>
+        <dynamics damping="0.0" friction="0.1"/>
+        <limit effort="1440" velocity="13.82" lower="0.0" upper="0.2673"/>
+<!--        0.0 0.2482-->
+        <safety_controller k_velocity="1000"
+                           k_position="100"
+                           soft_lower_limit="0.0"
+                           soft_upper_limit="0.2673"/>
+        <parent link="base_link"/>
+        <child link="yaw"/>
+        <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="left_pitch"/>
+
+    <link name="right_pitch"/>
+
+    <joint name="left_pitch_joint" type="revolute">
+        <origin xyz="-0.06  0 0.191 " rpy="0 0 0"/>
+        <dynamics damping="0.0" friction="0.1"/>
+        <limit effort="1440" velocity="13.82" lower="-0.213" upper="0.0"/>
+        <safety_controller k_velocity="1000"
+                           k_position="100"
+                           soft_lower_limit="-0.210"
+                           soft_upper_limit="-0.003"/>
+
+        <parent link="yaw"/>
+        <child link="left_pitch"/>
+        <axis xyz="0 1 0 "/>
+    </joint>
+
+    <joint name="right_pitch_joint" type="revolute">
+        <origin xyz="-0.06  0 0.191 " rpy="0 0 0"/>
+        <dynamics damping="0.0" friction="0.1"/>
+        <limit effort="1440" velocity="13.82" lower="-1E10" upper="1E10"/>
+        <safety_controller k_velocity="1000"
+                           k_position="100"
+                           soft_lower_limit="-0.210"
+                           soft_upper_limit="-0.003"/>
+
+        <parent link="yaw"/>
+        <child link="right_pitch"/>
+        <axis xyz="0 1 0 "/>
+    </joint>
+
+
+    <link name="trigger"/>
+
+    <joint name="trigger_joint" type="revolute">
+        <origin xyz="-0.064 0 0" rpy="0 0 0"/>
+        <dynamics damping="0.0" friction="0.01"/>
+        <limit effort="2577" velocity="35.758" lower="-0.01866" upper="0.0"/>
+        <parent link="base_link"/>
+        <child link="trigger"/>
+        <axis xyz="0 0 1 "/>
+
+    </joint>
+
+    <xacro:property name="wheel_offset_x" value="0.084"/>
+    <xacro:property name="wheel_offset_y" value="0.049"/>
+    <xacro:property name="wheel_offset_z" value="0.0"/>
+
+
+    <xacro:friction_wheel prefixs="left" connected_to="left_pitch"
+                          wheel_x_offset="${wheel_offset_x}" wheel_y_offset="${wheel_offset_y}"
+                          wheel_z_offset="${wheel_offset_z}"/>
+
+    <xacro:friction_wheel prefixs="right" connected_to="left_pitch"
+                          wheel_x_offset="${wheel_offset_x}" wheel_y_offset="${-wheel_offset_y}"
+                          wheel_z_offset="${wheel_offset_z}"/>
+</robot>

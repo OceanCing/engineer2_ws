@@ -1,0 +1,5 @@
+rm_controllers/engineer_lifter_controller
+/home/dynamicx/engineer2_ws/devel/.private/engineer_lifter_controller/lib/libengineer_lifter_controller.so /home/dynamicx/engineer2_ws/devel/lib/libengineer_lifter_controller.so
+/home/dynamicx/engineer2_ws/devel/.private/engineer_lifter_controller/lib/pkgconfig/engineer_lifter_controller.pc /home/dynamicx/engineer2_ws/devel/lib/pkgconfig/engineer_lifter_controller.pc
+/home/dynamicx/engineer2_ws/devel/.private/engineer_lifter_controller/share/engineer_lifter_controller/cmake/engineer_lifter_controllerConfig.cmake /home/dynamicx/engineer2_ws/devel/share/engineer_lifter_controller/cmake/engineer_lifter_controllerConfig.cmake
+/home/dynamicx/engineer2_ws/devel/.private/engineer_lifter_controller/share/engineer_lifter_controller/cmake/engineer_lifter_controllerConfig-version.cmake /home/dynamicx/engineer2_ws/devel/share/engineer_lifter_controller/cmake/engineer_lifter_controllerConfig-version.cmake

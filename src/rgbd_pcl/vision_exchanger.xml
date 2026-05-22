@@ -1,0 +1,16 @@
+<library path="lib/libVisionExchangerNodelet">
+    <class name="vision_exchanger/AssemblyPost" type="vision_exchanger::AssemblyPost" base_class_type="nodelet::Nodelet">
+        <description>
+            Vision exchanger nodelet
+        </description>
+    </class>
+
+
+
+    <class name="rgbd_pcl/RecordPointCloudNodelet" type="rgbd_pcl::RecordPointCloudNodelet" base_class_type="nodelet::Nodelet">
+        <description>
+            Point cloud preprocessing nodelet
+        </description>
+    </class>
+</library>
+

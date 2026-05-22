@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="lifter">
+    <xacro:macro name="lifter" params="connected_to">
+        <xacro:property name="left_lifter_joint_upper_limit" value="0"/>
+        <xacro:property name="left_lifter_joint_lower_limit" value="-0.27"/>
+        <xacro:property name="left_lifter_joint_velocity" value="0.9"/>
+        <xacro:property name="left_lifter_joint_effort" value="259.2"/>
+
+        <xacro:property name="right_lifter_joint_upper_limit" value="0"/>
+        <xacro:property name="right_lifter_joint_lower_limit" value="-0.27"/>
+        <xacro:property name="right_lifter_joint_velocity" value="0.9"/>
+        <xacro:property name="right_lifter_joint_effort" value="259.2"/>
+
+        <xacro:property name="wheel_velocity" value="25"/>
+        <xacro:property name="wheel_effort" value="2"/>
+
+        <!--link-->
+        <link name="left_lifter">
+            <visual>
+                <origin xyz="0. 0. 0." rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer2/left_lifter.stl"/>
+                </geometry>
+            </visual>
+            <inertial>
+                <mass value="2.255732"/>
+                <origin xyz="0.019252 -0.32218 -0.090254"/>
+                <inertia ixx="1.118e-1" ixy="9.24e-4" ixz="4.582e-4" iyy="3.472e-2" iyz="1.191e-3" izz="7.786e-2"/>
+            </inertial>
+            <collision>
+                <origin xyz="0. 0. 0." rpy="0. 0. 0."/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer2/left_lifter.stl"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <link name="right_lifter">
+            <visual>
+                <origin xyz="0. 0. 0." rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer2/right_lifter.stl"/>
+                </geometry>
+            </visual>
+            <inertial>
+                <mass value="2.255732"/>
+                <origin xyz="-0.019252 -0.32218 -0.090254"/>
+                <inertia ixx="1.118e-1" ixy="-9.24e-4" ixz="-4.582e-4" iyy="3.472e-2" iyz="1.191e-3" izz="7.786e-2"/>
+            </inertial>
+            <collision>
+                <origin xyz="0. 0. 0." rpy="0. 0. 0."/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer2/right_lifter.stl"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <link name="left_lifter_wheel">
+            <visual>
+                <origin xyz="0. 0. 0." rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer2/left_lifter_wheel.stl"/>
+                </geometry>
+            </visual>
+            <inertial>
+                <mass value="0.120935"/>
+                <origin xyz="0.008 0.0 0.0"/>
+                <inertia ixx="2.3280491e-5" ixy="1.599e-18" ixz="3.398e-18" iyy="1.5182155e-5" iyz="0.0" izz="1.5182158e-5"/>
+            </inertial>
+            <collision>
+                <origin xyz="0. 0. 0." rpy="0. 0. 0."/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer2/left_lifter_wheel.stl"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <link name="right_lifter_wheel">
+            <visual>
+                <origin xyz="0. 0. 0." rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer2/right_lifter_wheel.stl"/>
+                </geometry>
+            </visual>
+            <inertial>
+                <mass value="0.120935"/>
+                <origin xyz="0.008 0.0 0.0"/>
+                <inertia ixx="2.3280491e-5" ixy="1.599e-18" ixz="3.398e-18" iyy="1.5182155e-5" iyz="0.0" izz="1.5182158e-5"/>
+            </inertial>
+            <collision>
+                <origin xyz="0. 0. 0." rpy="0. 0. 0."/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer2/right_lifter_wheel.stl"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <!--joint-->
+        <joint name="left_lifter_joint" type="prismatic">
+            <parent link="${connected_to}"/>
+            <child link="left_lifter"/>
+            <origin xyz="-0.282 0.275 0.480" rpy="0 0 0"/>
+            <axis xyz="0 0 1"/>
+            <limit lower="${left_lifter_joint_lower_limit}" upper="${left_lifter_joint_upper_limit}"
+                   velocity="${left_lifter_joint_velocity}" effort="${left_lifter_joint_effort}"/>
+            <dynamics damping="0.0" friction="0.1"/>
+        </joint>
+
+        <joint name="right_lifter_joint" type="prismatic">
+            <parent link="${connected_to}"/>
+            <child link="right_lifter"/>
+            <origin xyz="0.282 0.275 0.480" rpy="0 0 0"/>
+            <axis xyz="0 0 1"/>
+            <limit lower="${right_lifter_joint_lower_limit}" upper="${right_lifter_joint_upper_limit}"
+                   velocity="${right_lifter_joint_velocity}" effort="${right_lifter_joint_effort}"/>
+            <dynamics damping="0.0" friction="0.1"/>
+        </joint>
+
+        <joint name="left_lifter_wheel_joint" type="continuous">
+            <parent link="left_lifter"/>
+            <child link="left_lifter_wheel"/>
+            <origin xyz="0.007 -0.575 -0.2385" rpy="0 0 0"/>
+            <axis xyz="1 0 0"/>
+            <limit velocity="${wheel_velocity}" effort="${wheel_effort}"/>
+            <dynamics damping="0.0" friction="0.05"/>
+        </joint>
+
+        <joint name="right_lifter_wheel_joint" type="continuous">
+            <parent link="right_lifter"/>
+            <child link="right_lifter_wheel"/>
+            <origin xyz="0.007 -0.575 -0.2385" rpy="0 0 0"/>
+            <axis xyz="1 0 0"/>
+            <limit velocity="${wheel_velocity}" effort="${wheel_effort}"/>
+            <dynamics damping="0.0" friction="0.05"/>
+        </joint>
+
+        <!--transmission-->
+        <transmission name="trans_left_lifter_joint">
+            <type>transmission_interface/SimpleTransmission</type>
+            <actuator name="left_lifter_motor">
+                <mechanicalReduction>-984.976</mechanicalReduction>
+            </actuator>
+            <joint name="left_lifter_joint">
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+                <offset>0.0</offset>
+            </joint>
+        </transmission>
+
+        <transmission name="trans_right_lifter_joint">
+            <type>transmission_interface/SimpleTransmission</type>
+            <actuator name="right_lifter_motor">
+                <mechanicalReduction>984.976</mechanicalReduction>
+            </actuator>
+            <joint name="right_lifter_joint">
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+                <offset>0.0</offset>
+            </joint>
+        </transmission>
+
+        <transmission name="trans_left_lifter_wheel_joint">
+            <type>transmission_interface/SimpleTransmission</type>
+            <actuator name="left_lifter_wheel_motor">
+                <mechanicalReduction>36</mechanicalReduction>
+            </actuator>
+            <joint name="left_lifter_wheel_joint">
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+                <offset>0.0</offset>
+            </joint>
+        </transmission>
+
+        <transmission name="trans_right_lifter_wheel_joint">
+            <type>transmission_interface/SimpleTransmission</type>
+            <actuator name="right_lifter_wheel_motor">
+                <mechanicalReduction>-36</mechanicalReduction>
+            </actuator>
+            <joint name="right_lifter_wheel_joint">
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+                <offset>0.0</offset>
+            </joint>
+        </transmission>
+    </xacro:macro>
+</robot>

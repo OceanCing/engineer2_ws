@@ -1,0 +1,47 @@
+<robot>
+
+    <transmission name="trans_yaw_joint">
+        <type>transmission_interface/SimpleTransmission</type>
+        <actuator name="yaw_joint_motor">
+            <mechanicalReduction>-1</mechanicalReduction>
+        </actuator>
+        <joint name="yaw_joint">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            <offset>-0.0199442</offset>
+        </joint>
+    </transmission>
+
+    <transmission name="trans_pitch_joint">
+        <type>transmission_interface/SimpleTransmission</type>
+        <actuator name="pitch_joint_motor">
+            <mechanicalReduction>-1</mechanicalReduction>
+        </actuator>
+        <joint name="pitch_joint">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            <offset>-0.720292</offset>
+        </joint>
+    </transmission>
+
+    <transmission name="trans_scope_joint">
+        <type>transmission_interface/SimpleTransmission</type>
+        <actuator name="scope_joint_motor">
+            <mechanicalReduction>-36</mechanicalReduction>
+        </actuator>
+        <joint name="scope_joint">
+            <offset>0.0</offset>
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </joint>
+    </transmission>
+
+    <transmission name="trans_image_transmission_joint">
+        <type>transmission_interface/SimpleTransmission</type>
+        <actuator name="image_transmission_joint_motor">
+            <mechanicalReduction>-3.75</mechanicalReduction>
+        </actuator>
+        <joint name="image_transmission_joint">
+            <offset>0.0</offset>
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </joint>
+    </transmission>
+
+</robot>

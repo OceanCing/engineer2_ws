@@ -1,0 +1,11 @@
+<library path="lib/librm_common">
+    <!-- Transmission types -->
+    <class name="transmission_interface/DifferentialGripperTransmission"
+           type="transmission_interface::DifferentialGripperTransmissionLoader"
+           base_class_type="transmission_interface::TransmissionLoader">
+        <description>
+            Coupled transmission for two motors driving roll and gripper joints.
+        </description>
+    </class>
+
+</library>

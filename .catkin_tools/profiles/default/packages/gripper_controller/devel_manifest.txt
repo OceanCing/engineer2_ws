@@ -1,0 +1,5 @@
+rm_controllers/gripper_controller
+/home/dynamicx/engineer2_ws/devel/.private/gripper_controller/lib/libgripper_controller.so /home/dynamicx/engineer2_ws/devel/lib/libgripper_controller.so
+/home/dynamicx/engineer2_ws/devel/.private/gripper_controller/lib/pkgconfig/gripper_controller.pc /home/dynamicx/engineer2_ws/devel/lib/pkgconfig/gripper_controller.pc
+/home/dynamicx/engineer2_ws/devel/.private/gripper_controller/share/gripper_controller/cmake/gripper_controllerConfig.cmake /home/dynamicx/engineer2_ws/devel/share/gripper_controller/cmake/gripper_controllerConfig.cmake
+/home/dynamicx/engineer2_ws/devel/.private/gripper_controller/share/gripper_controller/cmake/gripper_controllerConfig-version.cmake /home/dynamicx/engineer2_ws/devel/share/gripper_controller/cmake/gripper_controllerConfig-version.cmake

@@ -1,0 +1,56 @@
+engineer_arm_controller:
+  type: effort_controllers/JointTrajectoryController
+  joints:
+    - joint1
+    - joint2
+    - joint3
+    - joint4
+    - joint5
+    - joint6
+    - joint7
+  constraints:
+    goal_time: 5.0
+    stopped_velocity_tolerance: 0.05
+    joint1: { trajectory: 0.08, goal: 0.05 }
+    joint2: { trajectory: 0.08, goal: 0.05 }
+    joint3: { trajectory: 0.08, goal: 0.05 }
+    joint4: { trajectory: 0.08, goal: 0.05 }
+    joint5: { trajectory: 0.08, goal: 0.05 }
+    joint6: { trajectory: 0.08, goal: 0.05 }
+    joint7: { trajectory: 0.08, goal: 0.05 }
+  gains:
+    joint1:
+      p: 16000
+      d: 500
+      i: 100
+      i_clamp: 10
+    joint2:
+      p: 100
+      d: 10
+      i: 5
+      i_clamp: 5
+    joint3:
+      p: 1000
+      d: 20
+      i: 100
+      i_clamp: 10
+    joint4:
+      p: 500
+      d: 5
+      i: 1
+      i_clamp: 1
+    joint5:
+      p: 200
+      d: 2
+      i: 1
+      i_clamp: 1
+    joint6:
+      p: 100
+      d: 1
+      i: 1
+      i_clamp: 1
+    joint7:
+      p: 100
+      d: 1
+      i: 1
+      i_clamp: 1

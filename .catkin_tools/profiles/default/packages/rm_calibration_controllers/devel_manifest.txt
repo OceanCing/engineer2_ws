@@ -1,0 +1,5 @@
+rm_controllers/rm_calibration_controllers
+/home/dynamicx/engineer2_ws/devel/.private/rm_calibration_controllers/lib/librm_calibration_controllers.so /home/dynamicx/engineer2_ws/devel/lib/librm_calibration_controllers.so
+/home/dynamicx/engineer2_ws/devel/.private/rm_calibration_controllers/lib/pkgconfig/rm_calibration_controllers.pc /home/dynamicx/engineer2_ws/devel/lib/pkgconfig/rm_calibration_controllers.pc
+/home/dynamicx/engineer2_ws/devel/.private/rm_calibration_controllers/share/rm_calibration_controllers/cmake/rm_calibration_controllersConfig-version.cmake /home/dynamicx/engineer2_ws/devel/share/rm_calibration_controllers/cmake/rm_calibration_controllersConfig-version.cmake
+/home/dynamicx/engineer2_ws/devel/.private/rm_calibration_controllers/share/rm_calibration_controllers/cmake/rm_calibration_controllersConfig.cmake /home/dynamicx/engineer2_ws/devel/share/rm_calibration_controllers/cmake/rm_calibration_controllersConfig.cmake

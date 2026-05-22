@@ -1,0 +1,5 @@
+rm_controllers/gpio_controller
+/home/dynamicx/engineer2_ws/devel/.private/gpio_controller/lib/libgpio_controller.so /home/dynamicx/engineer2_ws/devel/lib/libgpio_controller.so
+/home/dynamicx/engineer2_ws/devel/.private/gpio_controller/lib/pkgconfig/gpio_controller.pc /home/dynamicx/engineer2_ws/devel/lib/pkgconfig/gpio_controller.pc
+/home/dynamicx/engineer2_ws/devel/.private/gpio_controller/share/gpio_controller/cmake/gpio_controllerConfig.cmake /home/dynamicx/engineer2_ws/devel/share/gpio_controller/cmake/gpio_controllerConfig.cmake
+/home/dynamicx/engineer2_ws/devel/.private/gpio_controller/share/gpio_controller/cmake/gpio_controllerConfig-version.cmake /home/dynamicx/engineer2_ws/devel/share/gpio_controller/cmake/gpio_controllerConfig-version.cmake

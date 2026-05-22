@@ -1,0 +1,107 @@
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:property name="threshold" value="0.05"/>
+    <xacro:property name="pitch_lower_limit" value="-0.665062"/>
+    <xacro:property name="pitch_upper_limit" value="0.291492"/>
+
+    <link name="yaw">
+        <inertial>
+            <mass value="1.059897"/>
+            <origin xyz="-0.114415 0.008557 0.169620" rpy="0 0 0"/>
+            <inertia ixx="4.032E-2" ixy="-3.757E-03" ixz="1.379E-2" iyy="4.228E-2"
+                     iyz="8.903E-3" izz="1.973E-2"/>
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://rm_description/meshes/hero2/yaw.stl" scale="0.001 0.001 0.001"/>
+            </geometry>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://rm_description/meshes/hero2/yaw.stl" scale="0.001 0.001 0.001"/>
+            </geometry>
+        </collision>
+    </link>
+
+    <joint name="yaw_joint" type="revolute">
+        <origin xyz="0 0 0.2645" rpy="0 0 0"/>
+        <dynamics damping="0.0" friction="0.1"/>
+        <limit effort="1.2" velocity="13.82" lower="-1E10" upper="1E10"/>
+        <parent link="base_link"/>
+        <child link="yaw"/>
+        <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="pitch">
+        <inertial>
+            <mass value="2.748687"/>
+            <origin xyz="0.113180 -0.001648 0.058835" rpy="0 0 0"/>
+            <inertia ixx="1.346E-2" ixy="3.612E-4" ixz="9.678E-4" iyy="2.734E-2"
+                     iyz="2.883E-4" izz="2.141E-2"/>
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://rm_description/meshes/hero2/pitch.stl" scale="0.001 0.001 0.001"/>
+            </geometry>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://rm_description/meshes/hero2/pitch.stl" scale="0.001 0.001 0.001"/>
+            </geometry>
+        </collision>
+    </link>
+
+    <joint name="pitch_joint" type="revolute">
+        <origin xyz="-0.05 0 0.155" rpy="0 0 0"/>
+        <dynamics damping="0.0" friction="0.1"/>
+        <limit effort="1.2" velocity="13.82" lower="${pitch_lower_limit}" upper="${pitch_upper_limit}"/>
+        <safety_controller k_velocity="0.1"
+                           k_position="100"
+                           soft_lower_limit="${pitch_lower_limit+threshold}"
+                           soft_upper_limit="${pitch_upper_limit-threshold}"/>
+        <parent link="yaw"/>
+        <child link="pitch"/>
+        <axis xyz="0 1 0 "/>
+    </joint>
+
+    <link name="scope">
+        <inertial>
+            <mass value="0.099558"/>
+            <origin xyz="0.049009 0.045317 0.027584"/>
+            <inertia ixx="9.3876809e-5" ixy="-4.4260235e-5" ixz="-2.460965e-5" iyy="9.7148059e-5" iyz="-3.4752921e-5"
+                     izz="1.376e-4"/>
+        </inertial>
+    </link>
+
+    <joint name="scope_joint" type="revolute">
+        <axis xyz="1 0 0"/>
+        <origin xyz="0.184 -0.059 0.132"/>
+        <limit effort="1.0" velocity="30" lower="0" upper="2.15"/>
+        <dynamics damping="0.0" friction="0.1"/>
+        <parent link="image_transmission"/>
+        <child link="scope"/>
+    </joint>
+
+    <link name="image_transmission">
+        <inertial>
+            <mass value="0.270492"/>
+            <origin xyz="-0.013377 -0.017283 -0.002873"/>
+            <inertia ixx="4.376e-4" ixy="6.4412008e-5" ixz="4.2193373e-5" iyy="2.930e-4" iyz="-1.272e-4"
+                     izz="5.407e-4"/>
+        </inertial>
+    </link>
+
+    <joint name="image_transmission_joint" type="revolute">
+        <axis xyz="0 1 0"/>
+        <origin xyz="0.160 0.0 0.1586"/>
+        <limit effort="0.975" velocity="253.336" lower="-0.745629" upper="0.0"/>
+        <dynamics damping="0.0" friction="0.1"/>
+        <parent link="pitch"/>
+        <child link="image_transmission"/>
+    </joint>
+
+</robot>

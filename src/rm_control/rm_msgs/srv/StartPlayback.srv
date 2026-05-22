@@ -1,0 +1,6 @@
+string filename
+float64 speed
+float64 sync_time
+---
+bool success
+string message

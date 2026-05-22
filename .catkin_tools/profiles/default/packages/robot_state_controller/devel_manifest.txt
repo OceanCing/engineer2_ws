@@ -1,0 +1,5 @@
+rm_controllers/robot_state_controller
+/home/dynamicx/engineer2_ws/devel/.private/robot_state_controller/lib/librobot_state_controller.so /home/dynamicx/engineer2_ws/devel/lib/librobot_state_controller.so
+/home/dynamicx/engineer2_ws/devel/.private/robot_state_controller/lib/pkgconfig/robot_state_controller.pc /home/dynamicx/engineer2_ws/devel/lib/pkgconfig/robot_state_controller.pc
+/home/dynamicx/engineer2_ws/devel/.private/robot_state_controller/share/robot_state_controller/cmake/robot_state_controllerConfig-version.cmake /home/dynamicx/engineer2_ws/devel/share/robot_state_controller/cmake/robot_state_controllerConfig-version.cmake
+/home/dynamicx/engineer2_ws/devel/.private/robot_state_controller/share/robot_state_controller/cmake/robot_state_controllerConfig.cmake /home/dynamicx/engineer2_ws/devel/share/robot_state_controller/cmake/robot_state_controllerConfig.cmake

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="ore_bin">
+
+    <xacro:macro name="ore_bin" params="connected_to simulation">
+        <xacro:property name="rotate_lower_limit" value="-0.005"/>
+        <xacro:property name="rotate_upper_limit" value="1.56"/>
+        <xacro:property name="lifter_lower_limit" value="0.01"/>
+        <xacro:property name="lifter_upper_limit" value="0.229"/>
+
+        <link name="ore_bin_rotator">
+            <inertial>
+                <mass value="0.603254"/>
+                <origin xyz="0.04473 -0.000044 0.249219"/>
+                <inertia ixx="6.989e-3" ixy="-2.425323e-6" ixz="1.376066e-5" iyy="1.092e-2"
+                         iyz="-8.353682e-5" izz="6.701e-3"/>
+            </inertial>
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer/ore_bin_rotator.stl"/>
+                </geometry>
+            </visual>
+            <collision>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer/ore_bin_rotator.stl"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <link name="ore_bin_lifter">
+            <inertial>
+                <mass value="0.406271"/>
+                <origin xyz="0.034643 -0.021179 0.446158"/>
+                <inertia ixx="4.853e-4" ixy="-2.3421124e-5" ixz="2.3726424e-5" iyy="2.458e-3"
+                         iyz="5.4965947e-5" izz="2.705e-3"/>
+            </inertial>
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer/ore_bin_lifter.stl"/>
+                </geometry>
+            </visual>
+            <collision>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer/ore_bin_lifter.stl"/>
+                </geometry>
+            </collision>
+        </link>
+
+
+        <joint name="ore_bin_rotate_joint" type="revolute">
+            <origin xyz="0.045  0. 0.1 " rpy="0 0 0"/>
+            <limit effort="1.2" velocity="50" lower="${rotate_lower_limit}" upper="${rotate_upper_limit}"/>
+            <parent link="${connected_to}"/>
+            <child link="ore_bin_rotator"/>
+            <axis xyz="0 0 1 "/>
+        </joint>
+
+        <joint name="ore_bin_lifter_joint" type="prismatic">
+            <origin xyz="0  0. 0.05 " rpy="0 0 0"/>
+            <limit effort="100.67" velocity="10" lower="${lifter_lower_limit}" upper="${lifter_upper_limit}"/>
+            <parent link="ore_bin_rotator"/>
+            <child link="ore_bin_lifter"/>
+            <axis xyz="0 0 1 "/>
+        </joint>
+
+        <transmission name="trans_ore_bin_rotate_joint">
+            <type>transmission_interface/SimpleTransmission</type>
+            <actuator name="ore_bin_rotate_joint_motor">
+                <mechanicalReduction>1</mechanicalReduction>
+            </actuator>
+            <joint name="ore_bin_rotate_joint">
+                <offset>0.05</offset>
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            </joint>
+        </transmission>
+
+        <transmission name="trans_ore_bin_lifter_joint">
+            <type>transmission_interface/SimpleTransmission</type>
+            <actuator name="ore_bin_lifter_joint_motor">
+                <mechanicalReduction>2400.0</mechanicalReduction>
+            </actuator>
+            <joint name="ore_bin_lifter_joint">
+                <offset>0.</offset>
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            </joint>
+        </transmission>
+    </xacro:macro>
+</robot>

@@ -1,0 +1,5 @@
+rm_control/rm_referee
+/home/dynamicx/engineer2_ws/devel/.private/rm_referee/lib/pkgconfig/rm_referee.pc /home/dynamicx/engineer2_ws/devel/lib/pkgconfig/rm_referee.pc
+/home/dynamicx/engineer2_ws/devel/.private/rm_referee/lib/rm_referee/rm_referee /home/dynamicx/engineer2_ws/devel/lib/rm_referee/rm_referee
+/home/dynamicx/engineer2_ws/devel/.private/rm_referee/share/rm_referee/cmake/rm_refereeConfig.cmake /home/dynamicx/engineer2_ws/devel/share/rm_referee/cmake/rm_refereeConfig.cmake
+/home/dynamicx/engineer2_ws/devel/.private/rm_referee/share/rm_referee/cmake/rm_refereeConfig-version.cmake /home/dynamicx/engineer2_ws/devel/share/rm_referee/cmake/rm_refereeConfig-version.cmake

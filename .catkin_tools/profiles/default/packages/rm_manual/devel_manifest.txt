@@ -1,0 +1,5 @@
+rm_manual
+/home/dynamicx/engineer2_ws/devel/.private/rm_manual/lib/pkgconfig/rm_manual.pc /home/dynamicx/engineer2_ws/devel/lib/pkgconfig/rm_manual.pc
+/home/dynamicx/engineer2_ws/devel/.private/rm_manual/lib/rm_manual/rm_manual /home/dynamicx/engineer2_ws/devel/lib/rm_manual/rm_manual
+/home/dynamicx/engineer2_ws/devel/.private/rm_manual/share/rm_manual/cmake/rm_manualConfig-version.cmake /home/dynamicx/engineer2_ws/devel/share/rm_manual/cmake/rm_manualConfig-version.cmake
+/home/dynamicx/engineer2_ws/devel/.private/rm_manual/share/rm_manual/cmake/rm_manualConfig.cmake /home/dynamicx/engineer2_ws/devel/share/rm_manual/cmake/rm_manualConfig.cmake

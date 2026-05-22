@@ -1,0 +1,142 @@
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:include filename="$(find rm_description)/urdf/common/mecanum_wheel_14roller.urdf.xacro"/>
+
+    <!-- https://upload.wikimedia.org/wikipedia/commons/5/52/Wheelbase_and_Track.png -->
+    <xacro:property name="wheel_track" value="0.426"/>
+    <xacro:property name="wheel_base" value="0.389"/>
+    <xacro:property name="wheel_offset_z" value="0.07"/>
+    <xacro:property name="extend_arm_upper_limit" value="2.635"/>
+    <xacro:property name="extend_arm_lower_limit" value="0"/>
+
+    <xacro:macro name="chassis" params="roller_type">
+
+        <link name="base_link">
+            <inertial>
+                <mass value="9.726368"/>
+                <origin xyz="-0.077625 -0.0020503 0.141165"/>
+                <inertia ixx="2.876e-1" ixy="6.089e-4" ixz="6.745e-2" iyy="3.832e-1"
+                         iyz="2.643e-3" izz="4.225e-1"/>
+            </inertial>
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer/base_link.stl"/>
+                </geometry>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer/base_link_box.stl"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <link name="extend_arm_front">
+            <inertial>
+                <mass value="1."/>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <inertia ixx="3.976e-1" ixy="-2.548e-3" ixz="5.205e-2" iyy="4.674e-1"
+                         iyz="3.654e-3" izz="4.792e-1"/>
+            </inertial>
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer/extend_arma.stl"/>
+                </geometry>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer/extend_arma.stl"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <link name="extend_arm_back">
+            <inertial>
+                <mass value="1."/>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <inertia ixx="3.976e-1" ixy="-2.548e-3" ixz="5.205e-2" iyy="4.674e-1"
+                         iyz="3.654e-3" izz="4.792e-1"/>
+            </inertial>
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer/extend_armb.stl"/>
+                </geometry>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer/extend_armb.stl"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <joint name="extend_arm_front_joint" type="revolute">
+            <origin xyz="0.2  -0.2713 0.108 " rpy="0 0 0"/>
+            <limit effort="1.2" velocity="50" lower="${extend_arm_lower_limit}" upper="${extend_arm_upper_limit}"/>
+            <parent link="base_link"/>
+            <child link="extend_arm_front"/>
+            <axis xyz="1 0 0 "/>
+        </joint>
+
+        <joint name="extend_arm_back_joint" type="revolute">
+            <origin xyz="-0.2  -0.2713 0.108 " rpy="0 0 0"/>
+            <limit effort="1.2" velocity="50" lower="${extend_arm_lower_limit}" upper="${extend_arm_upper_limit}"/>
+            <parent link="base_link"/>
+            <child link="extend_arm_back"/>
+            <axis xyz="1 0 0 "/>
+        </joint>
+
+        <transmission name="trans_extend_arm_front_joint">
+            <type>transmission_interface/SimpleTransmission</type>
+            <actuator name="extend_arm_front_joint_motor">
+                <mechanicalReduction>36</mechanicalReduction>
+            </actuator>
+            <joint name="extend_arm_front_joint">
+                <offset>0.</offset>
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            </joint>
+        </transmission>
+
+        <transmission name="trans_extend_arm_back_joint">
+            <type>transmission_interface/SimpleTransmission</type>
+            <actuator name="extend_arm_back_joint_motor">
+                <mechanicalReduction>-36</mechanicalReduction>
+            </actuator>
+            <joint name="extend_arm_back_joint">
+                <offset>0.</offset>
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            </joint>
+        </transmission>
+
+        <xacro:mecanum_wheel_14roller prefix="left_front" connected_to="base_link"
+                             wheel_x_offset="${wheel_track/2}" wheel_y_offset="${wheel_base/2}"
+                             wheel_z_offset="${wheel_offset_z}"
+                             reflect="1" roller_type="${roller_type}"
+                             max_effort="5" max_velocity="50"/>
+        <xacro:mecanum_wheel_14roller prefix="right_front" connected_to="base_link"
+                             wheel_x_offset="${wheel_track/2}" wheel_y_offset="${-wheel_base/2}"
+                             wheel_z_offset="${wheel_offset_z}"
+                             reflect="-1" roller_type="${roller_type}"
+                             max_effort="5" max_velocity="50"/>
+        <xacro:mecanum_wheel_14roller prefix="left_back" connected_to="base_link"
+                             wheel_x_offset="${-wheel_track/2}" wheel_y_offset="${wheel_base/2}"
+                             wheel_z_offset="${wheel_offset_z}"
+                             reflect="-1" roller_type="${roller_type}"
+                             max_effort="5" max_velocity="50"/>
+        <xacro:mecanum_wheel_14roller prefix="right_back" connected_to="base_link"
+                             wheel_x_offset="${-wheel_track/2}" wheel_y_offset="${-wheel_base/2}"
+                             wheel_z_offset="${wheel_offset_z}"
+                             reflect="1" roller_type="${roller_type}"
+                             max_effort="5" max_velocity="50"/>
+        <xacro:wheel_transmission prefix="left_front" mechanical_reduction="19.2032"/>
+        <xacro:wheel_transmission prefix="right_front" mechanical_reduction="-19.2032"/>
+        <xacro:wheel_transmission prefix="left_back" mechanical_reduction="19.2032"/>
+        <xacro:wheel_transmission prefix="right_back" mechanical_reduction="-19.2032"/>
+
+    </xacro:macro>
+
+</robot>

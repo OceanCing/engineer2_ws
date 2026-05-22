@@ -1,0 +1,5 @@
+rm_controllers/rm_chassis_controllers
+/home/dynamicx/engineer2_ws/devel/.private/rm_chassis_controllers/lib/librm_chassis_controllers.so /home/dynamicx/engineer2_ws/devel/lib/librm_chassis_controllers.so
+/home/dynamicx/engineer2_ws/devel/.private/rm_chassis_controllers/lib/pkgconfig/rm_chassis_controllers.pc /home/dynamicx/engineer2_ws/devel/lib/pkgconfig/rm_chassis_controllers.pc
+/home/dynamicx/engineer2_ws/devel/.private/rm_chassis_controllers/share/rm_chassis_controllers/cmake/rm_chassis_controllersConfig-version.cmake /home/dynamicx/engineer2_ws/devel/share/rm_chassis_controllers/cmake/rm_chassis_controllersConfig-version.cmake
+/home/dynamicx/engineer2_ws/devel/.private/rm_chassis_controllers/share/rm_chassis_controllers/cmake/rm_chassis_controllersConfig.cmake /home/dynamicx/engineer2_ws/devel/share/rm_chassis_controllers/cmake/rm_chassis_controllersConfig.cmake

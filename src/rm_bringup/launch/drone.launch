@@ -1,0 +1,26 @@
+<launch>
+    <arg name="robot_type" default="$(env ROBOT_TYPE)" doc="Robot type [standard, hero, engineer]"/>
+    <arg name="load_controller" default="true"/>
+    <arg name="imu_trigger" default="$(env IMU_TRIGGER)" doc="Bool"/>
+    <arg name="hw_name" default="$(env HW_NAME)" doc="Hw name [rm_can_hw, rm_ecat_hw]"/>
+
+    <rosparam file="$(find rm_dbus)/config/dbus.yaml" command="load"/>
+    <rosparam file="$(find rm_config)/config/rm_controllers/$(arg robot_type).yaml"/>
+
+    <node name="rm_dbus" pkg="rm_dbus" type="rm_dbus" respawn="false"/>
+
+    <include file="$(find rm_config)/launch/$(env HW_NAME).launch"/>
+
+    <include file="$(find rm_config)/launch/vision/camera.launch">
+        <arg name="imu_trigger" value="$(arg imu_trigger)"/>
+    </include>
+    <include file="$(find rm_config)/launch/vision/vision_loader.launch"/>
+
+    <include file="$(find rm_config)/launch/manual.launch"/>
+
+    <include file="$(find rm_config)/launch/referee.launch"/>
+
+    <include file="$(find vision_to_mavros)/launch/t265_all_nodes.launch">
+    </include>
+
+</launch>

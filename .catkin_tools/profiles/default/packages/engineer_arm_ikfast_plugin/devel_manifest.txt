@@ -1,0 +1,5 @@
+rm_engineer/engineer_arm_ikfast_plugin
+/home/dynamicx/engineer2_ws/devel/.private/engineer_arm_ikfast_plugin/lib/libengineer_arm_moveit_ikfast_plugin.so /home/dynamicx/engineer2_ws/devel/lib/libengineer_arm_moveit_ikfast_plugin.so
+/home/dynamicx/engineer2_ws/devel/.private/engineer_arm_ikfast_plugin/lib/pkgconfig/engineer_arm_ikfast_plugin.pc /home/dynamicx/engineer2_ws/devel/lib/pkgconfig/engineer_arm_ikfast_plugin.pc
+/home/dynamicx/engineer2_ws/devel/.private/engineer_arm_ikfast_plugin/share/engineer_arm_ikfast_plugin/cmake/engineer_arm_ikfast_pluginConfig.cmake /home/dynamicx/engineer2_ws/devel/share/engineer_arm_ikfast_plugin/cmake/engineer_arm_ikfast_pluginConfig.cmake
+/home/dynamicx/engineer2_ws/devel/.private/engineer_arm_ikfast_plugin/share/engineer_arm_ikfast_plugin/cmake/engineer_arm_ikfast_pluginConfig-version.cmake /home/dynamicx/engineer2_ws/devel/share/engineer_arm_ikfast_plugin/cmake/engineer_arm_ikfast_pluginConfig-version.cmake

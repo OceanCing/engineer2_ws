@@ -1,0 +1,9 @@
+uint16 ally_1_robot_hp
+uint16 ally_2_robot_hp
+uint16 ally_3_robot_hp
+uint16 ally_4_robot_hp
+uint16 ally_7_robot_hp
+uint16 ally_outpost_hp
+uint16 ally_base_hp
+
+time stamp

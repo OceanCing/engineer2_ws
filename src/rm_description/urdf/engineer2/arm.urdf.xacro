@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="arm">
+    <xacro:macro name="arm" params="connected_to use_simulation">
+        <xacro:property name="joint1_upper_limit" value="0.45"/>
+        <xacro:property name="joint1_lower_limit" value="0"/>
+        <xacro:property name="joint1_velocity" value="1.929"/>
+        <xacro:property name="joint1_effort" value="129.6"/>
+
+        <xacro:property name="joint2_upper_limit" value="1.695"/>
+        <xacro:property name="joint2_lower_limit" value="-3.376"/>
+        <xacro:property name="joint2_velocity" value="3.76"/>
+        <xacro:property name="joint2_effort" value="25"/>
+
+        <xacro:property name="joint3_upper_limit" value="1.324"/>
+        <xacro:property name="joint3_lower_limit" value="-1.088"/>
+        <xacro:property name="joint3_velocity" value="10.46"/>
+        <xacro:property name="joint3_effort" value="40"/>
+
+        <xacro:property name="joint4_upper_limit" value="1.08"/>
+        <xacro:property name="joint4_lower_limit" value="-1.4"/>
+        <xacro:property name="joint4_velocity" value="3.76"/>
+        <xacro:property name="joint4_effort" value="25"/>
+
+        <xacro:property name="joint5_upper_limit" value="2.073"/>
+        <xacro:property name="joint5_lower_limit" value="-2.115"/>
+        <xacro:property name="joint5_velocity" value="20.94"/>
+        <xacro:property name="joint5_effort" value="7"/>
+
+        <xacro:property name="joint6_upper_limit" value="1.6"/>
+        <xacro:property name="joint6_lower_limit" value="-1.6"/>
+        <xacro:property name="joint6_velocity" value="20.94"/>
+        <xacro:property name="joint6_effort" value="7"/>
+
+        <xacro:property name="joint7_upper_limit" value="2.62"/>
+        <xacro:property name="joint7_lower_limit" value="-2.62"/>
+        <xacro:property name="joint7_velocity" value="20.94"/>
+        <xacro:property name="joint7_effort" value="7"/>
+
+        <xacro:property name="gripper_upper_limit" value="0.99"/>
+        <xacro:property name="gripper_lower_limit" value="-0.01"/>
+        <xacro:property name="gripper_velocity" value="20.94"/>
+        <xacro:property name="gripper_effort" value="7"/>
+
+        <xacro:property name="rm3508_velocity" value="50"/>
+        <xacro:property name="rm3508_effort" value="5"/>
+        <xacro:property name="rm2006_velocity" value="30"/>
+        <xacro:property name="rm2006_effort" value="1"/>
+        <xacro:property name="P50_velocity" value="19"/>
+        <xacro:property name="P50_effort" value="13.157"/>
+
+        <xacro:property name="dm4310_velocity" value="20.94"/>
+        <xacro:property name="dm4310_effort" value="7"/>
+        <xacro:property name="dm4340_velocity" value="3.76"/>
+        <xacro:property name="dm4340_effort" value="25"/>
+        <xacro:property name="dm8009_velocity" value="10.46"/>
+        <xacro:property name="dm8009_effort" value="40"/>
+
+
+        <!--  link  -->
+        <link name="link1">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer2/link1.stl" />
+                </geometry>
+            </visual>
+            <inertial>
+                <mass value="2.95894"/>
+                <origin xyz="0.017617  -0.210045  -0.017709 "/>
+                <inertia ixx="5.363e-2" ixy="-1.042e-4" ixz="1.826433e-5" iyy="1.707e-3" iyz="-1.064e-3" izz="5.273e-2"/>
+            </inertial>
+            <collision>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer2/link1.stl" />
+                </geometry>
+            </collision>
+        </link>
+
+        <link name="link2">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer2/link2.stl"/>
+                </geometry>
+            </visual>
+            <inertial>
+                <mass value="3.65444"/>
+                <origin xyz="-0.002735  -0.000014  0.081453 "/>
+                <inertia ixx="4.913e-3" ixy="7.133253e-6" ixz="1.5806277e-5" iyy="4.084e-3" iyz="-4.639192e-6" izz="3.349e-3"/>
+            </inertial>
+            <collision>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer2/link2.stl"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <link name="link3">
+            <visual>
+                <origin xyz="0 0 0.0" rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer2/link3.stl" scale="0.1 0.1 0.1"/>
+                </geometry>
+            </visual>
+            <inertial>
+                <mass value="2.313792"/>
+                <origin xyz="0.020004  0.001007 0.121629"/>
+                <inertia ixx="1.290e-2" ixy="4.71639e-5" ixz="6.834e-4" iyy="1.305e-2" iyz="-4.6199667e-5" izz="1.065e-3"/>
+            </inertial>
+            <collision>
+                <origin xyz="0. 0. 0." rpy="0. 0. 0."/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer2/link3.stl" scale="0.1 0.1 0.1"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <link name="link4">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer2/link4.stl"/>
+                </geometry>
+            </visual>
+            <inertial>
+                <mass value="1.745846"/>
+                <origin xyz="0.020521  -0.038  -0.001506"/>
+                <inertia ixx="4.147e-3" ixy="2.591e-4" ixz="2.5793496e-5" iyy="9.859e-4" iyz="-1.157e-4" izz="3.754e-3"/>
+            </inertial>
+            <collision>
+                <origin xyz="0. 0. 0" rpy="0. 0. 0."/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer2/link4.stl"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <link name="link5">
+            <visual>
+                <origin xyz="0. 0. 0." rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer2/link5.stl"/>
+                </geometry>
+            </visual>
+            <inertial>
+                <mass value="1.488874"/>
+                <origin xyz="0.016968  -0.044812  0.000016 "/>
+                <inertia ixx="2.061e-3" ixy="-9.793896e-5" ixz="-8.21744e-7" iyy="2.166e-3" iyz="1.726043e-6" izz="3.482e-3"/>
+            </inertial>
+            <collision>
+                <origin xyz="0. 0.0 0." rpy="0. 0. 0."/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer2/link5.stl"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <link name="link6">
+            <visual>
+                <origin xyz="0. 0. 0." rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer2/link6.stl"/>
+                </geometry>
+            </visual>
+            <inertial>
+                <mass value="1.22143"/>
+                <origin xyz="-0.001799 0.031679 0.000001"/>
+                <inertia ixx="9.055e-4" ixy="-8.0200884e-5" ixz="3.79802e-7" iyy="1.201e-3" iyz="1.17991e-7" izz="1.561e-3"/>
+            </inertial>
+            <collision>
+                <origin xyz="0. 0. 0." rpy="0. 0. 0."/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer2/link6.stl"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <link name="link7">
+            <visual>
+                <origin xyz="0. 0. 0." rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer2/link7.stl"/>
+                </geometry>
+            </visual>
+            <inertial>
+                <mass value="1.6955"/>
+                <origin xyz="0.009284 -0.045785 -0.000098"/>
+                <inertia ixx="3.218e-3" ixy="8.837e-4" ixz="1.9697012e-5" iyy="1.954e-3" iyz="-1.69635e-7" izz="4.384e-3"/>
+            </inertial>
+            <collision>
+                <origin xyz="0. 0. 0." rpy="0. 0. 0."/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer2/link7.stl"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <link name="gripper_link">
+            <visual>
+                <origin xyz="0. 0. 0." rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer2/gripper_link.stl"/>
+                </geometry>
+            </visual>
+            <inertial>
+                <mass value="0.033278"/>
+                <origin xyz="0.0 -0.05825 0."/>
+                <inertia ixx="3.850523e-6" ixy="0." ixz="1.134e-16" iyy="7.612304e-6" iyz="0." izz="3.850523e-6"/>
+            </inertial>
+            <collision>
+                <origin xyz="0. 0. 0." rpy="0. 0. 0."/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer2/gripper_link.stl"/>
+                </geometry>
+            </collision>
+        </link>
+
+<!--        <link name="yaw">-->
+<!--            <visual>-->
+<!--                <origin xyz="0. 0. 0." rpy="0 0 0"/>-->
+<!--                <geometry>-->
+<!--                    <mesh filename="package://rm_description/meshes/engineer2/yaw.stl"/>-->
+<!--                </geometry>-->
+<!--            </visual>-->
+<!--            <inertial>-->
+<!--                <mass value="0.154291"/>-->
+<!--                <origin xyz="-0.002751 -0.000022 0.018234"/>-->
+<!--                <inertia ixx="6.4746961e-5" ixy="-2.5707e-8" ixz="5.567309e-6" iyy="1.598e-4" iyz="8.9675e-8" izz="1.833e-4"/>-->
+<!--            </inertial>-->
+<!--            <collision>-->
+<!--                <origin xyz="0. 0. 0." rpy="0. 0. 0."/>-->
+<!--                <geometry>-->
+<!--                    <mesh filename="package://rm_description/meshes/engineer2/yaw.stl"/>-->
+<!--                </geometry>-->
+<!--            </collision>-->
+<!--        </link>-->
+
+<!--        <link name="pitch">-->
+<!--            <visual>-->
+<!--                <origin xyz="0. 0. 0." rpy="0 0 0"/>-->
+<!--                <geometry>-->
+<!--                    <mesh filename="package://rm_description/meshes/engineer2/yaw.stl" scale="0.01 0.01 0.01"/>-->
+<!--                </geometry>-->
+<!--            </visual>-->
+<!--            <inertial>-->
+<!--                <mass value="0.154291"/>-->
+<!--                <origin xyz="-0.002751 -0.000022 0.018234"/>-->
+<!--                <inertia ixx="6.4746961e-5" ixy="-2.5707e-8" ixz="5.567309e-6" iyy="1.598e-4" iyz="8.9675e-8" izz="1.833e-4"/>-->
+<!--            </inertial>-->
+<!--        </link>-->
+
+        <link name="yaw"/>
+        <joint name="yaw_joint" type="fixed">
+            <parent link="base_link"/>
+            <child link="yaw"/>
+            <origin xyz="0. 0. 1." rpy="0 0 0"/>
+            <axis xyz="0 0 1"/>
+        </joint>
+<!--        <joint name="yaw_joint" type="revolute">-->
+<!--            <parent link="link2"/>-->
+<!--            <child link="yaw"/>-->
+<!--            <origin xyz="0. 0. 0.09" rpy="0 0 0"/>-->
+<!--            <axis xyz="0 0 1"/>-->
+<!--            <limit lower="-2.79" upper="3.1"-->
+<!--                   velocity="50" effort="1.2"/>-->
+<!--            <dynamics damping="0.0" friction="0.1"/>-->
+<!--        </joint>-->
+
+<!--        <joint name="pitch_joint" type="revolute">-->
+<!--            <parent link="yaw"/>-->
+<!--            <child link="pitch"/>-->
+<!--            <origin xyz="0. 0. 0.09" rpy="0 0 0"/>-->
+<!--            <axis xyz="0 1 0"/>-->
+<!--            <limit lower="-0.001" upper="0.001"-->
+<!--                   velocity="${joint2_velocity}" effort="${joint2_effort}"/>-->
+<!--            <dynamics damping="0.0" friction="0.1"/>-->
+<!--        </joint>-->
+
+
+
+        <joint name="joint1" type="prismatic">
+            <parent link="${connected_to}"/>
+            <child link="link1"/>
+            <origin xyz="-0.008 0.189 0.25475" rpy="0 0 0"/>
+            <axis xyz="0 0 1"/>
+            <xacro:if value="${use_simulation}">
+                <limit lower="${joint1_lower_limit}" upper="${joint1_upper_limit}"
+                       velocity="${joint1_velocity}" effort="300"/>
+            </xacro:if>
+            <xacro:unless value="${use_simulation}">
+                <limit lower="${joint1_lower_limit}" upper="${joint1_upper_limit}"
+                       velocity="${joint1_velocity}" effort="${joint1_effort}"/>
+            </xacro:unless>
+            <dynamics damping="0.0" friction="0.1"/>
+        </joint>
+
+
+        <joint name="joint2" type="revolute">
+            <parent link="link1"/>
+            <child link="link2"/>
+            <origin xyz="-0.040998 -0.390478 0.0083" rpy="0 0 0"/>
+            <axis xyz="0 0 1"/>
+            <limit lower="${joint2_lower_limit}" upper="${joint2_upper_limit}"
+                   velocity="${joint2_velocity}" effort="${joint2_effort}"/>
+            <dynamics damping="0.0" friction="0.1"/>
+        </joint>
+
+        <joint name="joint3" type="revolute">
+            <parent link="link2"/>
+            <child link="link3"/>
+            <origin xyz="-0.0379 0. 0.08495" rpy="0 0 0"/>
+            <axis xyz="1 0 0"/>
+            <limit lower="${joint3_lower_limit}" upper="${joint3_upper_limit}"
+                   velocity="${joint3_velocity}" effort="${joint3_effort}"/>
+            <dynamics damping="0.0" friction="0.1"/>
+        </joint>
+
+        <joint name="joint4" type="revolute">
+            <parent link="link3"/>
+            <child link="link4"/>
+            <origin xyz="0.004999 0. 0.185" rpy="0 0 0"/>
+            <axis xyz="1 0 0"/>
+            <limit lower="${joint4_lower_limit}" upper="${joint4_upper_limit}"
+                   velocity="${joint4_velocity}" effort="${joint4_effort}"/>
+            <dynamics damping="0.0" friction="0.1"/>
+        </joint>
+
+        <joint name="joint5" type="revolute">
+            <parent link="link4"/>
+            <child link="link5"/>
+            <origin xyz="0.032901 -0.128 0." rpy="0 0 0"/>
+            <axis xyz="0 1 0"/>
+            <limit lower="${joint5_lower_limit}" upper="${joint5_upper_limit}"
+                   velocity="${joint5_velocity}" effort="${joint5_effort}"/>
+            <dynamics damping="0.0" friction="0.1"/>
+        </joint>
+
+        <joint name="joint6" type="revolute">
+            <parent link="link5"/>
+            <child link="link6"/>
+            <origin xyz="0. -0.147 0." rpy="0 0 0"/>
+            <axis xyz="1 0 0"/>
+            <limit lower="${joint6_lower_limit}" upper="${joint6_upper_limit}"
+                   velocity="${joint6_velocity}" effort="${joint6_effort}"/>
+            <dynamics damping="0.0" friction="0.1"/>
+        </joint>
+
+
+        <joint name="joint7" type="revolute">
+            <parent link="link6"/>
+            <child link="link7"/>
+            <origin xyz="0. 0.007 0." rpy="0 0 0"/>
+            <axis xyz="0 1 0"/>
+            <limit lower="${joint7_lower_limit}" upper="${joint7_upper_limit}"
+                   velocity="${joint7_velocity}" effort="${joint7_effort}"/>
+            <dynamics damping="0.0" friction="0.1"/>
+        </joint>
+
+        <link name="tools_link"/>
+        <joint name="tools_joint" type="fixed">
+            <parent link="link7"/>
+            <child link="tools_link"/>
+            <origin xyz="0 -0.1 0." rpy="0 0 3.141"/>
+        </joint>
+
+        <joint name="gripper_joint" type="revolute">
+            <parent link="link7"/>
+            <child link="gripper_link"/>
+            <origin xyz="0. -0.05625 0." rpy="0 0 0"/>
+            <axis xyz="0 1 0"/>
+            <limit lower="${gripper_lower_limit}" upper="${gripper_upper_limit}"
+                   velocity="${gripper_velocity}" effort="${gripper_effort}"/>
+            <dynamics damping="0.0" friction="0.1"/>
+        </joint>
+    </xacro:macro>
+</robot>

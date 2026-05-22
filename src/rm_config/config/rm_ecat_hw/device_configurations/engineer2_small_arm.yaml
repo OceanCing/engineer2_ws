@@ -1,0 +1,7 @@
+can_motors:
+  ############ can0 ############
+  - can_id: 3
+    can_bus: 0
+    name: "joint3_motor"
+    type: "DM8009"
+    need_calibration: false

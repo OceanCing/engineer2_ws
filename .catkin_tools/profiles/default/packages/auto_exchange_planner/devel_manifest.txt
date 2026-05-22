@@ -1,0 +1,6 @@
+rm_engineer/auto_exchange_planner
+/home/dynamicx/engineer2_ws/devel/.private/auto_exchange_planner/lib/libmoveit_auto_exchange_planner_plugin.so.0.0.0 /home/dynamicx/engineer2_ws/devel/lib/libmoveit_auto_exchange_planner_plugin.so.0.0.0
+/home/dynamicx/engineer2_ws/devel/.private/auto_exchange_planner/lib/libmoveit_auto_exchange_planner_plugin.so /home/dynamicx/engineer2_ws/devel/lib/libmoveit_auto_exchange_planner_plugin.so
+/home/dynamicx/engineer2_ws/devel/.private/auto_exchange_planner/lib/pkgconfig/auto_exchange_planner.pc /home/dynamicx/engineer2_ws/devel/lib/pkgconfig/auto_exchange_planner.pc
+/home/dynamicx/engineer2_ws/devel/.private/auto_exchange_planner/share/auto_exchange_planner/cmake/auto_exchange_plannerConfig-version.cmake /home/dynamicx/engineer2_ws/devel/share/auto_exchange_planner/cmake/auto_exchange_plannerConfig-version.cmake
+/home/dynamicx/engineer2_ws/devel/.private/auto_exchange_planner/share/auto_exchange_planner/cmake/auto_exchange_plannerConfig.cmake /home/dynamicx/engineer2_ws/devel/share/auto_exchange_planner/cmake/auto_exchange_plannerConfig.cmake

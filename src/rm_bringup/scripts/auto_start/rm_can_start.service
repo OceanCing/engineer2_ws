@@ -1,0 +1,11 @@
+[Unit]
+Description=rm can hardware auto startup
+After=network-online.target
+[Service]
+User=dynamicx
+Type=simple
+#Type=forking
+ExecStart=/bin/bash -c "/home/dynamicx/rm_can_start.sh"
+LimitRTPRIO=infinity
+[Install]
+WantedBy=multi-user.target

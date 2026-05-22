@@ -1,0 +1,15 @@
+<launch>
+    <node pkg="nodelet" type="nodelet" name="VisionExchangerNodelet" args="manager" output="screen" respawn="true"/>
+    <!-- orbbec_gemini_336l -->
+<!--     <include file="$(find rgbd_pcl)/launch/record_pointcloud.launch" /> -->
+
+    <!-- hk_camera -->
+    <include file="$(find rgbd_pcl)/launch/side_camera.launch"/>
+
+    <node pkg="nodelet" type="nodelet" name="vision_exchanger"
+        args="load vision_exchanger/AssemblyPost VisionExchangerNodelet"
+        output="screen" respawn="true">
+        <remap from="/gemini_336l/color/image_raw" to="/hk_camera/image_raw"/>
+    </node>
+
+</launch>·

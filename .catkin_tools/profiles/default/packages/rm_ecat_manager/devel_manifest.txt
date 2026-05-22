@@ -1,0 +1,5 @@
+rm_ecat_dev/rm_ecat_manager
+/home/dynamicx/engineer2_ws/devel/.private/rm_ecat_manager/lib/librm_ecat_manager.so /home/dynamicx/engineer2_ws/devel/lib/librm_ecat_manager.so
+/home/dynamicx/engineer2_ws/devel/.private/rm_ecat_manager/lib/pkgconfig/rm_ecat_manager.pc /home/dynamicx/engineer2_ws/devel/lib/pkgconfig/rm_ecat_manager.pc
+/home/dynamicx/engineer2_ws/devel/.private/rm_ecat_manager/share/rm_ecat_manager/cmake/rm_ecat_managerConfig.cmake /home/dynamicx/engineer2_ws/devel/share/rm_ecat_manager/cmake/rm_ecat_managerConfig.cmake
+/home/dynamicx/engineer2_ws/devel/.private/rm_ecat_manager/share/rm_ecat_manager/cmake/rm_ecat_managerConfig-version.cmake /home/dynamicx/engineer2_ws/devel/share/rm_ecat_manager/cmake/rm_ecat_managerConfig-version.cmake

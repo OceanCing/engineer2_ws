@@ -1,0 +1,8 @@
+<library path="lib/libdeep_exchanger">
+    <class
+            name="deep_exchanger/DeepExchanger"
+            type="deep_exchanger::DeepExchanger"
+            base_class_type="nodelet::Nodelet">
+        <description>This is a deep_exchanger plugin.</description>
+    </class>
+</library>

@@ -1,0 +1,5 @@
+rm_controllers/multi_dof_controller
+/home/dynamicx/engineer2_ws/devel/.private/multi_dof_controller/lib/libmulti_dof_controller.so /home/dynamicx/engineer2_ws/devel/lib/libmulti_dof_controller.so
+/home/dynamicx/engineer2_ws/devel/.private/multi_dof_controller/lib/pkgconfig/multi_dof_controller.pc /home/dynamicx/engineer2_ws/devel/lib/pkgconfig/multi_dof_controller.pc
+/home/dynamicx/engineer2_ws/devel/.private/multi_dof_controller/share/multi_dof_controller/cmake/multi_dof_controllerConfig.cmake /home/dynamicx/engineer2_ws/devel/share/multi_dof_controller/cmake/multi_dof_controllerConfig.cmake
+/home/dynamicx/engineer2_ws/devel/.private/multi_dof_controller/share/multi_dof_controller/cmake/multi_dof_controllerConfig-version.cmake /home/dynamicx/engineer2_ws/devel/share/multi_dof_controller/cmake/multi_dof_controllerConfig-version.cmake

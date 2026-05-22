@@ -1,0 +1,8 @@
+soem_interface/soem_rsl
+/home/dynamicx/engineer2_ws/devel/.private/soem_rsl/lib/libsoem_rsl.a /home/dynamicx/engineer2_ws/devel/lib/libsoem_rsl.a
+/home/dynamicx/engineer2_ws/devel/.private/soem_rsl/lib/pkgconfig/soem_rsl.pc /home/dynamicx/engineer2_ws/devel/lib/pkgconfig/soem_rsl.pc
+/home/dynamicx/engineer2_ws/devel/.private/soem_rsl/lib/soem_rsl/simple_test /home/dynamicx/engineer2_ws/devel/lib/soem_rsl/simple_test
+/home/dynamicx/engineer2_ws/devel/.private/soem_rsl/lib/soem_rsl/slaveinfo /home/dynamicx/engineer2_ws/devel/lib/soem_rsl/slaveinfo
+/home/dynamicx/engineer2_ws/devel/.private/soem_rsl/lib/soem_rsl/eepromtool /home/dynamicx/engineer2_ws/devel/lib/soem_rsl/eepromtool
+/home/dynamicx/engineer2_ws/devel/.private/soem_rsl/share/soem_rsl/cmake/soem_rslConfig.cmake /home/dynamicx/engineer2_ws/devel/share/soem_rsl/cmake/soem_rslConfig.cmake
+/home/dynamicx/engineer2_ws/devel/.private/soem_rsl/share/soem_rsl/cmake/soem_rslConfig-version.cmake /home/dynamicx/engineer2_ws/devel/share/soem_rsl/cmake/soem_rslConfig-version.cmake

@@ -1,0 +1,10 @@
+[Unit]
+Description=ROS Nodes Reconnection
+After=rm_ecat_start.service start_master.service
+[Service]
+Type=simple
+ExecStart=/bin/bash -c "/home/dynamicx/node_reconnection.sh"
+Restart=always
+RestartSec=10
+[Install]
+WantedBy=multi-user.target

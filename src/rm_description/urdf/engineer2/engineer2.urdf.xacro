@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="engineer2">
+    <xacro:arg name="load_chassis" default="true"/>
+    <xacro:arg name="load_arm" default="true"/>
+    <xacro:arg name="load_lifter" default="true"/>
+    <xacro:arg name="use_simulation" default="false"/>
+    <xacro:arg name="camera_link" default="camera_link"/>
+    <xacro:arg name="camera_optical_frame" default="camera_optical_frame"/>
+    <xacro:arg name="roller_type" default="none"/>
+
+    <xacro:if value="$(arg load_chassis)">
+        <xacro:include filename="$(find rm_description)/urdf/engineer2/chassis.urdf.xacro"/>
+        <xacro:chassis roller_type="$(arg roller_type)"/>
+    </xacro:if>
+
+    <xacro:if value="$(arg load_arm)">
+        <xacro:include filename="$(find rm_description)/urdf/engineer2/arm.urdf.xacro"/>
+        <xacro:arm connected_to="base_link" use_simulation="$(arg use_simulation)"/>
+
+        <xacro:include filename="$(find rm_description)/urdf/engineer2/arm.transmission.xacro"/>
+        <xacro:arm_transmission use_simulation="$(arg use_simulation)"/>
+
+<!--        <xacro:unless value="$(arg use_simulation)">-->
+<!--            <xacro:include filename="$(find rm_description)/urdf/common/camera.urdf.xacro"/>-->
+<!--&lt;!&ndash;            <xacro:camera_sensor xyz="-0.0232 0 0.3765" rpy="0. 0. 0." frame_id="$(arg camera_link)" parent="gimbal_lifter"&ndash;&gt;-->
+<!--&lt;!&ndash;                                 camera_sim="$(arg use_simulation)" camera_type="hk_camera"/>&ndash;&gt;-->
+<!--            <xacro:camera_optical_frame xyz="0.0 0.0 0.05"-->
+<!--                                        rpy="-1.57 0.0 -1.57"-->
+<!--                                        frame_id="$(arg camera_optical_frame)"-->
+<!--                                        parent="yaw"-->
+<!--                                        camera_sim="false"/>-->
+
+<!--        </xacro:unless>-->
+
+    </xacro:if>
+
+    <xacro:if value="$(arg load_lifter)">
+        <xacro:include filename="$(find rm_description)/urdf/engineer2/lifter.urdf.xacro"/>
+        <xacro:lifter connected_to="base_link"/>
+    </xacro:if>
+
+    <xacro:if value="$(arg use_simulation)">
+        <gazebo>
+            <plugin name="rm_ros_control" filename="librm_robot_hw_sim.so">
+                <robotNamespace>/</robotNamespace>
+                <robotSimType>rm_gazebo/RmRobotHWSim</robotSimType>
+            </plugin>
+        </gazebo>
+    </xacro:if>
+
+    <link name="exchange_orientation"/>
+    <joint name="exchange_orientation_joint" type="fixed">
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 -1.57"/>
+        <parent link="base_link"/>
+        <child link="exchange_orientation"/>
+    </joint>
+</robot>

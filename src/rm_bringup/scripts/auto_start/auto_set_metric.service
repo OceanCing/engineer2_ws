@@ -1,0 +1,14 @@
+[Unit]
+Description=Auto set metric to solve the confict between ethercat and switch
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStartPre=/bin/sleep 3
+ExecStart=/home/dynamicx/auto_set_metric.sh
+User=dynamicx
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

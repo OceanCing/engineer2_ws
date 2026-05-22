@@ -1,0 +1,5 @@
+rm_controllers/tof_radar_controller
+/home/dynamicx/engineer2_ws/devel/.private/tof_radar_controller/lib/libtof_radar_controller.so /home/dynamicx/engineer2_ws/devel/lib/libtof_radar_controller.so
+/home/dynamicx/engineer2_ws/devel/.private/tof_radar_controller/lib/pkgconfig/tof_radar_controller.pc /home/dynamicx/engineer2_ws/devel/lib/pkgconfig/tof_radar_controller.pc
+/home/dynamicx/engineer2_ws/devel/.private/tof_radar_controller/share/tof_radar_controller/cmake/tof_radar_controllerConfig-version.cmake /home/dynamicx/engineer2_ws/devel/share/tof_radar_controller/cmake/tof_radar_controllerConfig-version.cmake
+/home/dynamicx/engineer2_ws/devel/.private/tof_radar_controller/share/tof_radar_controller/cmake/tof_radar_controllerConfig.cmake /home/dynamicx/engineer2_ws/devel/share/tof_radar_controller/cmake/tof_radar_controllerConfig.cmake

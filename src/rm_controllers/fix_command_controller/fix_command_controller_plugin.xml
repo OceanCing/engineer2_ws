@@ -1,0 +1,10 @@
+<library path="lib/libfix_command_controller">
+  <!-- controller_interface types -->
+  <class name="fix_command_controller/FixCommandController"
+         type="fix_command_controller::FixCommandController"
+         base_class_type="controller_interface::ControllerBase">
+    <description>
+        The fixed command controller
+    </description>
+  </class>
+</library>

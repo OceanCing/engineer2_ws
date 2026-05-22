@@ -1,0 +1,123 @@
+rm_manual:
+  dbus_topic: "/rm_ecat_hw/dbus"
+  robot_type: "engineer2"
+  chassis:
+    topic: "/cmd_chassis"
+    accel_x:
+      - [ 200.0,8. ]
+    accel_y:
+      - [ 200.0,8. ]
+    accel_z:
+      - [ 200.0,30. ]
+    safety_power: 120
+    capacitor_threshold: 0.1
+    is_new_capacitor: false
+    charge_power: 0
+    extra_power: 5000
+    burst_power: 999
+    buffer_threshold: 10
+    power_gain: 0.85
+    speed_scale: 0.8
+
+    fast_speed_scale: 1.2
+    normal_speed_scale: 0.5
+    low_speed_scale: 0.08
+    exchange_speed_scale: 0.25
+    big_island_speed_scale: 0.18
+
+    fast_gyro_scale: 1.5
+    normal_gyro_scale: 0.5
+    low_gyro_scale: 0.2
+    exchange_gyro_scale: 0.35
+
+  vel:
+    topic: "/cmd_vel"
+    max_linear_x:
+      - [ 50.0,3. ]
+      - [ 80.0,3. ]
+      - [ 200.0,3. ]
+    max_linear_y:
+      - [ 50.0,3. ]
+      - [ 80.0,3. ]
+      - [ 200.0,3. ]
+    max_angular_z:
+      - [ 50.0,3. ]
+      - [ 80.0,3. ]
+      - [ 200.0,3. ]
+    gyro_move_reduction: 1
+    gyro_rotate_reduction: 1
+  servo:
+    topic: "/servo_server/delta_twist_cmds"
+    max_linear_x: 0.05
+    max_linear_y: 0.05
+    max_linear_z: 0.05
+    max_angular_x: 0.2
+    max_angular_y: 0.2
+    max_angular_z: 0.2
+  joint_servo:
+    topic: "/servo_server/delta_joint_cmds"
+    joint_names: [ "joint1", "joint2", "joint3", "joint4", "joint5", "joint6", "joint7" ]
+    max_vel: [ 0.08, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5 ]
+  gimbal:
+    topic: "/controllers/gimbal_controller/command"
+    max_yaw_vel: 2.5
+    max_pitch_vel: 1
+#    time_constant_rc: 0.02
+#    time_constant_pc: 0.08
+    gimbal_scale: 30
+    track_timeout: 0.5
+    finish_turning_threshold: 2.9
+    target_cost_function:
+      k_pos: 1.0
+      k_vel: 1.0
+      k_hp: 1.0
+      k_freq: 1.0
+      timeout: 0.0
+  lifter:
+    topic: "/engineer_lifter_cmd"
+    lifter_scale: 0.02
+    wheel_scale: 20.0
+  custom_controller:
+    custom_data_offset: [ -0.84, -5.99, -3.25, -2.88 ,-4.45, -5.99 ] # make the minimum value zero
+    custom2joint_orientation: [ -1, -1, 1, 1, -1, 1 ] # same/different -> 1/-1
+    custom2joint_offset: [ 1.685, 1.315, -3.503, -2.0, 1.57, -2.582 ] # [ joint2,joint3,joint4,joint5,joint6,joint7 ]
+    custom_joystick_offset: [ 2029, 2148, 2049, 2037 ] # [ l_x,l_y,r_x,r_y ]
+    custom_joystick_dead_zone: 200
+    custom_joint1_speed_scare: 0.1
+    variable_joint4_limit: -0.2
+    yaw_lock_pid: { p: 1.1, i: 0.0, d: 0.01, i_clamp_max: 0, i_clamp_min: 0, antiwindup: true, publish_state: true }
+
+
+  chassis_calibrate_motor: [ ]
+  gimbal_calibrate_motor: [ ]
+  shooter_calibrate_motor: [ ]
+
+  controllers_list:
+    state_controllers:
+      - controllers/robot_state_controller
+      - controllers/joint_state_controller
+    main_controllers:
+      - controllers/arm_trajectory_controller
+      - controllers/chassis_controller
+#      - controllers/gimbal_controller
+      - controllers/gripper_controller
+      - controllers/lifter_controller
+
+    calibration_controllers:
+      - controllers/joint1_calibration_controller
+      - controllers/left_lifter_calibration_controller
+      - controllers/right_lifter_calibration_controller
+
+  calibration_gather:
+    - start_controllers:
+        - controllers/joint1_calibration_controller
+        - controllers/left_lifter_calibration_controller
+        - controllers/right_lifter_calibration_controller
+      stop_controllers:
+#        - controllers/gimbal_controller
+        - controllers/arm_trajectory_controller
+        - controllers/lifter_controller
+      services_name:
+        - /controllers/joint1_calibration_controller/is_calibrated
+        - /controllers/left_lifter_calibration_controller/is_calibrated
+        - /controllers/right_lifter_calibration_controller/is_calibrated

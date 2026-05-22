@@ -1,0 +1,849 @@
+/*******************************************************************************
+ * BSD 3-Clause License
+ *
+ * Copyright (c) 2021, Qiayuan Liao
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************/
+
+//
+// Created by peter on 2021/5/17.
+//
+#include "rm_referee/referee.h"
+
+namespace rm_referee
+{
+// read data from referee
+void Referee::read()
+{
+  if (base_.serial_.available())
+  {
+    rx_len_ = static_cast<int>(base_.serial_.available());
+    base_.serial_.read(rx_buffer_, rx_len_);
+  }
+  else
+    return;
+  uint8_t temp_buffer[256] = { 0 };
+  int frame_len;
+  if (ros::Time::now() - last_get_data_time_ > ros::Duration(0.1))
+    base_.referee_data_is_online_ = false;
+  if (rx_len_ < k_unpack_buffer_length_)
+  {
+    for (int k_i = 0; k_i < k_unpack_buffer_length_ - rx_len_; ++k_i)
+      temp_buffer[k_i] = unpack_buffer_[k_i + rx_len_];
+    for (int k_i = 0; k_i < rx_len_; ++k_i)
+      temp_buffer[k_i + k_unpack_buffer_length_ - rx_len_] = rx_buffer_[k_i];
+    for (int k_i = 0; k_i < k_unpack_buffer_length_; ++k_i)
+      unpack_buffer_[k_i] = temp_buffer[k_i];
+  }
+  for (int k_i = 0; k_i < k_unpack_buffer_length_ - k_frame_length_; ++k_i)
+  {
+    if (unpack_buffer_[k_i] == 0xA5)
+    {
+      frame_len = unpack(&unpack_buffer_[k_i]);
+      if (frame_len != -1)
+        k_i += frame_len;
+    }
+  }
+  getRobotInfo();
+  clearRxBuffer();
+}
+
+int Referee::unpack(uint8_t* rx_data)
+{
+  uint16_t cmd_id;
+  int frame_len;
+  rm_referee::FrameHeader frame_header;
+
+  memcpy(&frame_header, rx_data, k_header_length_);
+  if (static_cast<bool>(base_.verifyCRC8CheckSum(rx_data, k_header_length_)))
+  {
+    if (frame_header.data_length > 256)  // temporary and inaccurate value
+    {
+      ROS_INFO("discard possible wrong frames, data length: %d", frame_header.data_length);
+      return 0;
+    }
+    frame_len = frame_header.data_length + k_header_length_ + k_cmd_id_length_ + k_tail_length_;
+
+    if (base_.verifyCRC16CheckSum(rx_data, frame_len) == 1)
+    {
+      cmd_id = (rx_data[6] << 8 | rx_data[5]);
+      switch (cmd_id)
+      {
+        case rm_referee::RefereeCmdId::GAME_STATUS_CMD:
+        {
+          rm_referee::GameStatus game_status_ref;
+          rm_msgs::GameStatus game_status_data;
+          memcpy(&game_status_ref, rx_data + 7, sizeof(rm_referee::GameStatus));
+
+          game_status_data.game_type = game_status_ref.game_type;
+          game_status_data.game_progress = game_status_ref.game_progress;
+          game_status_data.stage_remain_time = game_status_ref.stage_remain_time;
+          game_status_data.sync_time_stamp = game_status_ref.sync_time_stamp;
+          game_status_data.stamp = last_get_data_time_;
+
+          referee_ui_.gameStatusDataCallBack(game_status_data, last_get_data_time_);
+          game_status_pub_.publish(game_status_data);
+          break;
+        }
+        case rm_referee::RefereeCmdId::GAME_RESULT_CMD:
+        {
+          rm_referee::GameResult game_result_ref;
+          memcpy(&game_result_ref, rx_data + 7, sizeof(rm_referee::GameResult));
+          break;
+        }
+        case rm_referee::RefereeCmdId::GAME_ROBOT_HP_CMD:
+        {
+          rm_referee::GameRobotHp game_robot_hp_ref;
+          rm_msgs::GameRobotHp game_robot_hp_data;
+          memcpy(&game_robot_hp_ref, rx_data + 7, sizeof(rm_referee::GameRobotHp));
+
+          game_robot_hp_data.ally_1_robot_hp = game_robot_hp_ref.ally_1_robot_hp;
+          game_robot_hp_data.ally_2_robot_hp = game_robot_hp_ref.ally_2_robot_hp;
+          game_robot_hp_data.ally_3_robot_hp = game_robot_hp_ref.ally_3_robot_hp;
+          game_robot_hp_data.ally_4_robot_hp = game_robot_hp_ref.ally_4_robot_hp;
+          game_robot_hp_data.ally_7_robot_hp = game_robot_hp_ref.ally_7_robot_hp;
+          game_robot_hp_data.ally_outpost_hp = game_robot_hp_ref.ally_outpost_hp;
+          game_robot_hp_data.ally_base_hp = game_robot_hp_ref.ally_base_hp;
+          game_robot_hp_data.stamp = last_get_data_time_;
+
+          referee_ui_.updateGameRobotHpDataCallBack(game_robot_hp_data);
+          game_robot_hp_pub_.publish(game_robot_hp_data);
+          break;
+        }
+        case rm_referee::RefereeCmdId::FIELD_EVENTS_CMD:
+        {
+          rm_referee::EventData event_ref;
+          rm_msgs::EventData event_data;
+          memcpy(&event_ref, rx_data + 7, sizeof(rm_referee::EventData));
+          const uint32_t event_bits = event_ref.event_data;
+
+          event_data.supply_zone_state = static_cast<bool>((event_bits >> 0) & 0x1u);
+          event_data.supply_zone_state_rmul = static_cast<bool>((event_bits >> 2) & 0x1u);
+          event_data.small_power_rune_state = static_cast<uint8_t>((event_bits >> 3) & 0x3u);
+          event_data.large_power_rune_state = static_cast<uint8_t>((event_bits >> 5) & 0x3u);
+          event_data.central_elevated_ground_state = static_cast<uint8_t>((event_bits >> 7) & 0x3u);
+          event_data.trapezoidal_elevated_ground_state = static_cast<uint8_t>((event_bits >> 9) & 0x3u);
+          event_data.be_hit_time = static_cast<uint16_t>((event_bits >> 11) & 0x1FFu);
+          event_data.be_hit_target = static_cast<uint8_t>((event_bits >> 20) & 0x7u);
+          event_data.central_point_state = static_cast<uint8_t>((event_bits >> 23) & 0x3u);
+          event_data.fortress_point_state = static_cast<uint8_t>((event_bits >> 25) & 0x3u);
+          event_data.outpost_point_state = static_cast<uint8_t>((event_bits >> 27) & 0x3u);
+          event_data.base_point_state = static_cast<bool>((event_bits >> 29) & 0x1u);
+          event_data.stamp = last_get_data_time_;
+
+          event_data_pub_.publish(event_data);
+          break;
+        }
+        case rm_referee::RefereeCmdId::SUPPLY_PROJECTILE_ACTION_CMD:
+        {
+          rm_referee::SupplyProjectileAction supply_projectile_action_ref;
+          rm_msgs::SupplyProjectileAction supply_projectile_action_data;
+          memcpy(&supply_projectile_action_ref, rx_data + 7, sizeof(rm_referee::SupplyProjectileAction));
+
+          supply_projectile_action_data.reserved = supply_projectile_action_ref.reserved;
+          supply_projectile_action_data.supply_projectile_num = supply_projectile_action_ref.supply_projectile_num;
+          supply_projectile_action_data.supply_projectile_step = supply_projectile_action_ref.supply_projectile_step;
+          supply_projectile_action_data.supply_robot_id = supply_projectile_action_ref.supply_robot_id;
+          supply_projectile_action_data.stamp = last_get_data_time_;
+
+          referee_ui_.supplyBulletDataCallBack(supply_projectile_action_data);
+          supply_projectile_action_pub_.publish(supply_projectile_action_data);
+          break;
+        }
+        case rm_referee::RefereeCmdId::REFEREE_WARNING_CMD:
+        {
+          rm_referee::RefereeWarning referee_warning_ref;
+          memcpy(&referee_warning_ref, rx_data + 7, sizeof(rm_referee::RefereeWarning));
+          break;
+        }
+        case rm_referee::RefereeCmdId::DART_INFO_CMD:
+        {
+          rm_referee::DartInfo dart_info_ref;
+          rm_msgs::DartInfo dart_info_data;
+          memcpy(&dart_info_ref, rx_data + 7, sizeof(rm_referee::DartInfo));
+
+          dart_info_data.dart_remaining_time = dart_info_ref.dart_remaining_time;
+          dart_info_data.dart_last_aim_state = dart_info_ref.dart_last_aim_state;
+          dart_info_data.enemy_total_hit_received = dart_info_ref.enemy_total_hit_received;
+          dart_info_data.dart_current_target = dart_info_ref.dart_current_target;
+          dart_info_data.stamp = last_get_data_time_;
+
+          dart_info_pub_.publish(dart_info_data);
+          break;
+        }
+        case rm_referee::RefereeCmdId::ROBOT_STATUS_CMD:
+        {
+          rm_referee::GameRobotStatus game_robot_status_ref;
+          rm_msgs::GameRobotStatus game_robot_status_data;
+          memcpy(&game_robot_status_ref, rx_data + 7, sizeof(rm_referee::GameRobotStatus));
+
+          game_robot_status_data.remain_hp = game_robot_status_ref.remain_hp;
+          game_robot_status_data.robot_level = game_robot_status_ref.robot_level;
+          game_robot_status_data.max_hp = game_robot_status_ref.max_hp;
+          game_robot_status_data.shooter_cooling_limit = game_robot_status_ref.shooter_cooling_limit;
+          game_robot_status_data.shooter_cooling_rate = game_robot_status_ref.shooter_cooling_rate;
+          game_robot_status_data.chassis_power_limit = game_robot_status_ref.chassis_power_limit;
+          game_robot_status_data.mains_power_chassis_output = game_robot_status_ref.mains_power_chassis_output;
+          game_robot_status_data.mains_power_gimbal_output = game_robot_status_ref.mains_power_gimbal_output;
+          game_robot_status_data.mains_power_shooter_output = game_robot_status_ref.mains_power_shooter_output;
+          game_robot_status_data.robot_id = game_robot_status_ref.robot_id;
+          base_.robot_id_ = game_robot_status_ref.robot_id;
+          game_robot_status_data.stamp = last_get_data_time_;
+
+          referee_ui_.robotStatusDataCallBack(game_robot_status_data, last_get_data_time_);
+          game_robot_status_pub_.publish(game_robot_status_data);
+          break;
+        }
+        case rm_referee::RefereeCmdId::POWER_HEAT_DATA_CMD:
+        {
+          rm_referee::PowerHeatData power_heat_ref;
+          rm_msgs::PowerHeatData power_heat_data;
+          memcpy(&power_heat_ref, rx_data + 7, sizeof(rm_referee::PowerHeatData));
+
+          power_heat_data.chassis_power_buffer = power_heat_ref.chassis_power_buffer;
+          power_heat_data.shooter_id_1_17_mm_cooling_heat = power_heat_ref.shooter_id_1_17_mm_cooling_heat;
+          power_heat_data.shooter_id_1_42_mm_cooling_heat = power_heat_ref.shooter_id_1_42_mm_cooling_heat;
+
+          power_heat_data.stamp = last_get_data_time_;
+
+          power_heat_data_pub_.publish(power_heat_data);
+          break;
+        }
+        case rm_referee::RefereeCmdId::ROBOT_POS_CMD:
+        {
+          rm_referee::GameRobotPos game_robot_pos_ref;
+          rm_msgs::GameRobotPosData game_robot_pos_data;
+          memcpy(&game_robot_pos_ref, rx_data + 7, sizeof(rm_referee::GameRobotPos));
+
+          game_robot_pos_data.x = game_robot_pos_ref.x;
+          game_robot_pos_data.y = game_robot_pos_ref.y;
+          game_robot_pos_data.yaw = game_robot_pos_ref.yaw;
+          game_robot_pos_pub_.publish(game_robot_pos_data);
+          break;
+        }
+        case rm_referee::RefereeCmdId::BUFF_CMD:
+        {
+          rm_referee::Buff referee_buff;
+          rm_msgs::Buff robot_buff;
+          memcpy(&referee_buff, rx_data + 7, sizeof(rm_referee::Buff));
+          robot_buff.attack_buff = referee_buff.attack_buff;
+          robot_buff.defence_buff = referee_buff.defence_buff;
+          robot_buff.vulnerability_buff = referee_buff.vulnerability_buff;
+          robot_buff.cooling_buff = referee_buff.cooling_buff;
+          robot_buff.recovery_buff = referee_buff.recovery_buff;
+
+          if (referee_buff.remaining_energy == 0x80)
+            robot_buff.remaining_energy = 100;
+          else if (referee_buff.remaining_energy & 0x01)
+            robot_buff.remaining_energy = 125;
+          else if (referee_buff.remaining_energy & 0x02)
+            robot_buff.remaining_energy = 100;
+          else if (referee_buff.remaining_energy & 0x04)
+            robot_buff.remaining_energy = 50;
+          else if (referee_buff.remaining_energy & 0x08)
+            robot_buff.remaining_energy = 30;
+          else if (referee_buff.remaining_energy & 0x10)
+            robot_buff.remaining_energy = 15;
+          else if (referee_buff.remaining_energy & 0x20)
+            robot_buff.remaining_energy = 5;
+          else if (referee_buff.remaining_energy & 0x40)
+            robot_buff.remaining_energy = 1;
+          else
+            robot_buff.remaining_energy = 0;
+
+          buff_pub_.publish(robot_buff);
+          break;
+        }
+        case rm_referee::RefereeCmdId::ROBOT_HURT_CMD:
+        {
+          rm_referee::RobotHurt robot_hurt_ref;
+          rm_msgs::RobotHurt robot_hurt_data;
+          memcpy(&robot_hurt_ref, rx_data + 7, sizeof(rm_referee::RobotHurt));
+
+          robot_hurt_data.armor_id = robot_hurt_ref.armor_id;
+          robot_hurt_data.hurt_type = robot_hurt_ref.hurt_type;
+          robot_hurt_data.stamp = last_get_data_time_;
+
+          referee_ui_.robotHurtDataCallBack(robot_hurt_data, last_get_data_time_);
+
+          robot_hurt_pub_.publish(robot_hurt_data);
+          break;
+        }
+        case rm_referee::RefereeCmdId::SHOOT_DATA_CMD:
+        {
+          rm_referee::ShootData shoot_data_ref;
+          rm_msgs::ShootData shoot_data;
+
+          memcpy(&shoot_data_ref, rx_data + 7, sizeof(rm_referee::ShootData));
+
+          shoot_data.bullet_freq = shoot_data_ref.bullet_freq;
+          shoot_data.bullet_speed = shoot_data_ref.bullet_speed;
+          shoot_data.bullet_type = shoot_data_ref.bullet_type;
+          shoot_data.shooter_id = shoot_data_ref.shooter_id;
+          shoot_data.stamp = last_get_data_time_;
+
+          referee_ui_.updateShootDataDataCallBack(shoot_data);
+          shoot_data_pub_.publish(shoot_data);
+          break;
+        }
+        case rm_referee::RefereeCmdId::BULLET_REMAINING_CMD:
+        {
+          rm_referee::BulletAllowance bullet_allowance_ref;
+          rm_msgs::BulletAllowance bullet_allowance_data;
+          memcpy(&bullet_allowance_ref, rx_data + 7, sizeof(rm_referee::BulletAllowance));
+
+          bullet_allowance_data.bullet_allowance_num_17_mm = bullet_allowance_ref.bullet_allowance_num_17_mm;
+          bullet_allowance_data.bullet_allowance_num_42_mm = bullet_allowance_ref.bullet_allowance_num_42_mm;
+          bullet_allowance_data.coin_remaining_num = bullet_allowance_ref.coin_remaining_num;
+          bullet_allowance_data.projectile_allowance_fortress = bullet_allowance_ref.projectile_allowance_fortress;
+          bullet_allowance_data.stamp = last_get_data_time_;
+          referee_ui_.bulletRemainDataCallBack(bullet_allowance_data, last_get_data_time_);
+
+          bullet_allowance_pub_.publish(bullet_allowance_data);
+          break;
+        }
+        case rm_referee::RefereeCmdId::ROBOT_RFID_STATUS_CMD:
+        {
+          rm_referee::RfidStatus rfid_status_ref;
+          rm_msgs::RfidStatus rfid_status_data;
+          memcpy(&rfid_status_ref, rx_data + 7, sizeof(rm_referee::RfidStatus));
+
+          const uint32_t rfid_status = rfid_status_ref.rfid_status;
+          const uint8_t rfid_status_2 = rfid_status_ref.rfid_status_2;
+          auto bit32 = [&](int bit) { return static_cast<bool>((rfid_status >> bit) & 0x1u); };
+          auto bit8 = [&](int bit) { return static_cast<bool>((rfid_status_2 >> bit) & 0x1u); };
+
+          rfid_status_data.rfid_status = rfid_status_ref.rfid_status;
+          rfid_status_data.rfid_status_2 = rfid_status_ref.rfid_status_2;
+          rfid_status_data.base_buff_point_state = bit32(0);
+          rfid_status_data.own_central_elevated_ground_state = bit32(1);
+          rfid_status_data.enemy_central_elevated_ground_state = bit32(2);
+          rfid_status_data.own_trapezoidal_elevated_ground_state = bit32(3);
+          rfid_status_data.enemy_trapezoidal_elevated_ground_state = bit32(4);
+          rfid_status_data.forward_own_terrain_span_buff_point_state = bit32(5);
+          rfid_status_data.behind_own_terrain_span_buff_point_state = bit32(6);
+          rfid_status_data.forward_enemy_terrain_span_buff_point_state = bit32(7);
+          rfid_status_data.behind_enemy_terrain_span_buff_point_state = bit32(8);
+          rfid_status_data.below_central_own_terrain_span_buff_point_state = bit32(9);
+          rfid_status_data.upper_central_own_terrain_span_buff_point_state = bit32(10);
+          rfid_status_data.below_central_enemy_terrain_span_buff_point_state = bit32(11);
+          rfid_status_data.upper_central_enemy_terrain_span_buff_point_state = bit32(12);
+          rfid_status_data.below_road_own_terrain_span_buff_point_state = bit32(13);
+          rfid_status_data.upper_road_own_terrain_span_buff_point_state = bit32(14);
+          rfid_status_data.below_road_enemy_terrain_span_buff_point_state = bit32(15);
+          rfid_status_data.upper_road_enemy_terrain_span_buff_point_state = bit32(16);
+          rfid_status_data.own_fort_buff_point_state = bit32(17);
+          rfid_status_data.own_outpost_buff_point_state = bit32(18);
+          rfid_status_data.non_overlapping_supplier_zone_state = bit32(19);
+          rfid_status_data.overlapping_supplier_zone_state = bit32(20);
+          rfid_status_data.own_assembly_buff_point_state = bit32(21);
+          rfid_status_data.enemy_assembly_buff_point_state = bit32(22);
+          rfid_status_data.central_buff_point_state = bit32(23);
+          rfid_status_data.enemy_fort_buff_point_state = bit32(24);
+          rfid_status_data.enemy_outpost_buff_point_state = bit32(25);
+          rfid_status_data.own_tunnel_road_lower_buff_point_state = bit32(26);
+          rfid_status_data.own_tunnel_road_middle_buff_point_state = bit32(27);
+          rfid_status_data.own_tunnel_road_upper_buff_point_state = bit32(28);
+          rfid_status_data.own_tunnel_trapezoid_lower_buff_point_state = bit32(29);
+          rfid_status_data.own_tunnel_trapezoid_middle_buff_point_state = bit32(30);
+          rfid_status_data.own_tunnel_trapezoid_upper_buff_point_state = bit32(31);
+          rfid_status_data.enemy_tunnel_road_lower_buff_point_state = bit8(0);
+          rfid_status_data.enemy_tunnel_road_middle_buff_point_state = bit8(1);
+          rfid_status_data.enemy_tunnel_road_upper_buff_point_state = bit8(2);
+          rfid_status_data.enemy_tunnel_trapezoid_lower_buff_point_state = bit8(3);
+          rfid_status_data.enemy_tunnel_trapezoid_middle_buff_point_state = bit8(4);
+          rfid_status_data.enemy_tunnel_trapezoid_upper_buff_point_state = bit8(5);
+          rfid_status_data.stamp = last_get_data_time_;
+
+          rfid_status_pub_.publish(rfid_status_data);
+          break;
+        }
+        case rm_referee::RefereeCmdId::DART_CLIENT_CMD:
+        {
+          rm_referee::DartClientCmd dart_client_cmd_ref;
+          rm_msgs::DartClientCmd dart_client_cmd_data;
+          memcpy(&dart_client_cmd_ref, rx_data + 7, sizeof(rm_referee::DartClientCmd));
+          dart_client_cmd_data.dart_launch_opening_status = dart_client_cmd_ref.dart_launch_opening_status;
+          dart_client_cmd_data.reserved = dart_client_cmd_ref.reserved;
+          dart_client_cmd_data.target_change_time = dart_client_cmd_ref.target_change_time;
+          dart_client_cmd_data.latest_launch_cmd_time = dart_client_cmd_ref.latest_launch_cmd_time;
+          dart_client_cmd_data.stamp = last_get_data_time_;
+
+          dart_client_cmd_pub_.publish(dart_client_cmd_data);
+          break;
+        }
+        case rm_referee::ROBOTS_POS_CMD:
+        {
+          rm_referee::RobotsPositionData robots_position_ref;
+          rm_msgs::RobotsPositionData robots_position_data;
+          memcpy(&robots_position_ref, rx_data + 7, sizeof(rm_referee::RobotsPositionData));
+
+          robots_position_data.engineer_x = robots_position_ref.engineer_x;
+          robots_position_data.engineer_y = robots_position_ref.engineer_y;
+          robots_position_data.hero_x = robots_position_ref.hero_x;
+          robots_position_data.hero_y = robots_position_ref.hero_y;
+          robots_position_data.standard_3_x = robots_position_ref.standard_3_x;
+          robots_position_data.standard_3_y = robots_position_ref.standard_3_y;
+          robots_position_data.standard_4_x = robots_position_ref.standard_4_x;
+          robots_position_data.standard_4_y = robots_position_ref.standard_4_y;
+          robots_position_data.stamp = last_get_data_time_;
+
+          robots_position_pub_.publish(robots_position_data);
+          break;
+        }
+        case rm_referee::RADAR_MARK_CMD:
+        {
+          rm_referee::RadarMarkData radar_mark_ref;
+          rm_msgs::RadarMarkData radar_mark_data;
+          memcpy(&radar_mark_ref, rx_data + 7, sizeof(rm_referee::RadarMarkData));
+
+          const uint16_t mark_bits = radar_mark_ref.mark_progress;
+          auto mark_bit = [&](int bit) { return static_cast<bool>((mark_bits >> bit) & 0x1u); };
+
+          radar_mark_data.mark_progress = radar_mark_ref.mark_progress;
+          radar_mark_data.enemy_hero_vulnerable = mark_bit(0);
+          radar_mark_data.enemy_engineer_vulnerable = mark_bit(1);
+          radar_mark_data.enemy_standard_3_vulnerable = mark_bit(2);
+          radar_mark_data.enemy_standard_4_vulnerable = mark_bit(3);
+          radar_mark_data.enemy_aerial_special_mark = mark_bit(4);
+          radar_mark_data.enemy_sentry_vulnerable = mark_bit(5);
+          radar_mark_data.own_hero_special_mark = mark_bit(6);
+          radar_mark_data.own_engineer_special_mark = mark_bit(7);
+          radar_mark_data.own_standard_3_special_mark = mark_bit(8);
+          radar_mark_data.own_standard_4_special_mark = mark_bit(9);
+          radar_mark_data.own_aerial_special_mark = mark_bit(10);
+          radar_mark_data.own_sentry_special_mark = mark_bit(11);
+          radar_mark_data.mark_hero_progress = radar_mark_data.enemy_hero_vulnerable;
+          radar_mark_data.mark_engineer_progress = radar_mark_data.enemy_engineer_vulnerable;
+          radar_mark_data.mark_standard_3_progress = radar_mark_data.enemy_standard_3_vulnerable;
+          radar_mark_data.mark_standard_4_progress = radar_mark_data.enemy_standard_4_vulnerable;
+          radar_mark_data.mark_sentry_progress = radar_mark_data.enemy_sentry_vulnerable;
+          radar_mark_data.stamp = last_get_data_time_;
+
+          radar_mark_pub_.publish(radar_mark_data);
+          break;
+        }
+        case rm_referee::RefereeCmdId::INTERACTIVE_DATA_CMD:
+        {
+          rm_referee::InteractiveData interactive_data_ref;  // local variable temporarily before moving referee data
+          memcpy(&interactive_data_ref, rx_data + 7, sizeof(rm_referee::InteractiveData));
+          if (interactive_data_ref.header_data.data_cmd_id == rm_referee::DataCmdId::BULLET_NUM_SHARE_CMD)
+          {
+            rm_referee::BulletNumData bullet_num_data_ref;
+            memcpy(&bullet_num_data_ref, rx_data + 7, sizeof(rm_referee::BulletNumData));
+            referee_ui_.updateBulletRemainData(bullet_num_data_ref);
+          }
+          else if (interactive_data_ref.header_data.data_cmd_id == rm_referee::DataCmdId::SENTRY_TO_RADAR_CMD)
+          {
+            rm_referee::SentryAttackingTargetData sentry_attacking_target_data_ref;
+            rm_msgs::SentryAttackingTarget sentry_attacking_target_data_data;
+            memcpy(&sentry_attacking_target_data_ref, rx_data + 7, sizeof(rm_referee::SentryAttackingTargetData));
+            sentry_attacking_target_data_data.target_robot_ID = sentry_attacking_target_data_ref.target_robot_ID;
+            sentry_attacking_target_data_data.target_position_x = sentry_attacking_target_data_ref.target_position_x;
+            sentry_attacking_target_data_data.target_position_y = sentry_attacking_target_data_ref.target_position_y;
+            sentry_to_radar_pub_.publish(sentry_attacking_target_data_data);
+          }
+          else if (interactive_data_ref.header_data.data_cmd_id == rm_referee::DataCmdId::RADAR_TO_SENTRY_CMD)
+          {
+            rm_referee::RadarToSentryData radar_to_sentry_data_ref;
+            rm_msgs::RadarToSentry radar_to_sentry_data;
+            memcpy(&radar_to_sentry_data_ref, rx_data + 7, sizeof(rm_referee::RadarToSentryData));
+            radar_to_sentry_data.robot_ID = radar_to_sentry_data_ref.robot_ID;
+            radar_to_sentry_data.position_x = radar_to_sentry_data_ref.position_x;
+            radar_to_sentry_data.position_y = radar_to_sentry_data_ref.position_y;
+            radar_to_sentry_data.engineer_marked = radar_to_sentry_data_ref.engineer_marked;
+            radar_to_sentry_pub_.publish(radar_to_sentry_data);
+          }
+          break;
+        }
+        case rm_referee::CLIENT_MAP_CMD:
+        {
+          rm_referee::ClientMapReceiveData client_map_receive_ref;
+          rm_msgs::ClientMapReceiveData client_map_receive_data;
+          memcpy(&client_map_receive_ref, rx_data + 7, sizeof(rm_referee::ClientMapReceiveData));
+          client_map_receive_data.opponent_hero_position_x = client_map_receive_ref.opponent_hero_position_x;
+          client_map_receive_data.opponent_hero_position_y = client_map_receive_ref.opponent_hero_position_y;
+          client_map_receive_data.opponent_engineer_position_x = client_map_receive_ref.opponent_engineer_position_x;
+          client_map_receive_data.opponent_engineer_position_y = client_map_receive_ref.opponent_engineer_position_y;
+          client_map_receive_data.opponent_infantry_3_position_x =
+              client_map_receive_ref.opponent_infantry_3_position_x;
+          client_map_receive_data.opponent_infantry_3_position_y =
+              client_map_receive_ref.opponent_infantry_3_position_y;
+          client_map_receive_data.opponent_infantry_4_position_x =
+              client_map_receive_ref.opponent_infantry_4_position_x;
+          client_map_receive_data.opponent_infantry_4_position_y =
+              client_map_receive_ref.opponent_infantry_4_position_y;
+          client_map_receive_data.opponent_aerial_position_x = client_map_receive_ref.opponent_aerial_position_x;
+          client_map_receive_data.opponent_aerial_position_y = client_map_receive_ref.opponent_aerial_position_y;
+          client_map_receive_data.opponent_sentry_position_x = client_map_receive_ref.opponent_sentry_position_x;
+          client_map_receive_data.opponent_sentry_position_y = client_map_receive_ref.opponent_sentry_position_y;
+          client_map_receive_data.ally_hero_position_x = client_map_receive_ref.ally_hero_position_x;
+          client_map_receive_data.ally_hero_position_y = client_map_receive_ref.ally_hero_position_y;
+          client_map_receive_data.ally_engineer_position_x = client_map_receive_ref.ally_engineer_position_x;
+          client_map_receive_data.ally_engineer_position_y = client_map_receive_ref.ally_engineer_position_y;
+          client_map_receive_data.ally_infantry_3_position_x = client_map_receive_ref.ally_infantry_3_position_x;
+          client_map_receive_data.ally_infantry_3_position_y = client_map_receive_ref.ally_infantry_3_position_y;
+          client_map_receive_data.ally_infantry_4_position_x = client_map_receive_ref.ally_infantry_4_position_x;
+          client_map_receive_data.ally_infantry_4_position_y = client_map_receive_ref.ally_infantry_4_position_y;
+          client_map_receive_data.ally_aerial_position_x = client_map_receive_ref.ally_aerial_position_x;
+          client_map_receive_data.ally_aerial_position_y = client_map_receive_ref.ally_aerial_position_y;
+          client_map_receive_data.ally_sentry_position_x = client_map_receive_ref.ally_sentry_position_x;
+          client_map_receive_data.ally_sentry_position_y = client_map_receive_ref.ally_sentry_position_y;
+          client_map_receive_data.stamp = last_get_data_time_;
+          client_map_receive_pub_.publish(client_map_receive_data);
+          break;
+        }
+        case rm_referee::CUSTOM_TO_ROBOT_CMD:
+        {
+          rm_referee::CustomInfo custom_info;
+          memcpy(&custom_info, rx_data + 7, sizeof(rm_referee::CustomInfo));
+          break;
+        }
+        case rm_referee::TARGET_POS_CMD:
+        {
+          rm_referee::ClientMapSendData client_map_send_data_ref;
+          rm_msgs::ClientMapSendData client_map_send_data;
+          memcpy(&client_map_send_data_ref, rx_data + 7, sizeof(rm_referee::ClientMapSendData));
+
+          client_map_send_data.target_position_x = client_map_send_data_ref.target_position_x;
+          client_map_send_data.target_position_y = client_map_send_data_ref.target_position_y;
+          client_map_send_data.command_keyboard = client_map_send_data_ref.command_keyboard;
+          client_map_send_data.target_robot_ID = client_map_send_data_ref.target_robot_ID;
+          client_map_send_data.cmd_source = client_map_send_data_ref.cmd_source;
+          client_map_send_data_pub_.publish(client_map_send_data);
+          break;
+        }
+        case rm_referee::SENTRY_INFO_CMD:
+        {
+          rm_referee::SentryInfo sentry_info_ref;
+          rm_msgs::SentryInfo sentry_info;
+          memcpy(&sentry_info_ref, rx_data + 7, sizeof(rm_referee::SentryInfo));
+          const uint32_t sentry_info_bits = sentry_info_ref.sentry_info;
+          const uint16_t sentry_info_2_bits = sentry_info_ref.sentry_info_2;
+
+          sentry_info.sentry_info = sentry_info_ref.sentry_info;
+          sentry_info.sentry_info_2 = sentry_info_ref.sentry_info_2;
+          sentry_info.exchanged_bullet_allowance = static_cast<uint16_t>(sentry_info_bits & 0x7FFu);
+          sentry_info.remote_bullet_exchange_success_cnt = static_cast<uint8_t>((sentry_info_bits >> 11) & 0xFu);
+          sentry_info.remote_hp_exchange_success_cnt = static_cast<uint8_t>((sentry_info_bits >> 15) & 0xFu);
+          sentry_info.can_confirm_free_respawn = static_cast<bool>((sentry_info_bits >> 19) & 0x1u);
+          sentry_info.can_exchange_instant_respawn = static_cast<bool>((sentry_info_bits >> 20) & 0x1u);
+          sentry_info.instant_respawn_cost = static_cast<uint16_t>((sentry_info_bits >> 21) & 0x3FFu);
+          sentry_info.is_out_of_war = static_cast<bool>(sentry_info_2_bits & 0x1u);
+          sentry_info.remaining_bullets_can_supply = static_cast<uint16_t>((sentry_info_2_bits >> 1) & 0x7FFu);
+          sentry_info.sentry_mode = static_cast<uint8_t>((sentry_info_2_bits >> 12) & 0x3u);
+          sentry_info.can_activate_energy_mechanism = static_cast<bool>((sentry_info_2_bits >> 14) & 0x1u);
+          sentry_info_pub_.publish(sentry_info);
+          break;
+        }
+        case rm_referee::RADAR_INFO_CMD:
+        {
+          rm_referee::RadarInfo radar_info_ref;
+          rm_msgs::RadarInfo radar_info;
+          memcpy(&radar_info_ref, rx_data + 7, sizeof(rm_referee::RadarInfo));
+          const uint8_t radar_info_bits = radar_info_ref.radar_info;
+          radar_info.radar_info = radar_info_ref.radar_info;
+          radar_info.double_vulnerability_chances = static_cast<uint8_t>(radar_info_bits & 0x3u);
+          radar_info.enemy_in_double_vulnerability = static_cast<bool>((radar_info_bits >> 2) & 0x1u);
+          radar_info.own_encryption_level = static_cast<uint8_t>((radar_info_bits >> 3) & 0x3u);
+          radar_info.can_modify_key = static_cast<bool>((radar_info_bits >> 5) & 0x1u);
+          radar_info_pub_.publish(radar_info);
+          break;
+        }
+        case rm_referee::RADAR_WIRELESS_ENEMY_ROBOT_POS_CMD:
+        {
+          rm_referee::RadarWirelessEnemyRobotPos enemy_robot_pos_ref;
+          rm_msgs::RadarWirelessEnemyRobotPos enemy_robot_pos_data;
+          memcpy(&enemy_robot_pos_ref, rx_data + 7, sizeof(rm_referee::RadarWirelessEnemyRobotPos));
+          enemy_robot_pos_data.hero_position_x = enemy_robot_pos_ref.hero_position_x;
+          enemy_robot_pos_data.hero_position_y = enemy_robot_pos_ref.hero_position_y;
+          enemy_robot_pos_data.engineer_position_x = enemy_robot_pos_ref.engineer_position_x;
+          enemy_robot_pos_data.engineer_position_y = enemy_robot_pos_ref.engineer_position_y;
+          enemy_robot_pos_data.infantry_3_position_x = enemy_robot_pos_ref.infantry_3_position_x;
+          enemy_robot_pos_data.infantry_3_position_y = enemy_robot_pos_ref.infantry_3_position_y;
+          enemy_robot_pos_data.infantry_4_position_x = enemy_robot_pos_ref.infantry_4_position_x;
+          enemy_robot_pos_data.infantry_4_position_y = enemy_robot_pos_ref.infantry_4_position_y;
+          enemy_robot_pos_data.aerial_position_x = enemy_robot_pos_ref.aerial_position_x;
+          enemy_robot_pos_data.aerial_position_y = enemy_robot_pos_ref.aerial_position_y;
+          enemy_robot_pos_data.sentry_position_x = enemy_robot_pos_ref.sentry_position_x;
+          enemy_robot_pos_data.sentry_position_y = enemy_robot_pos_ref.sentry_position_y;
+          enemy_robot_pos_data.stamp = last_get_data_time_;
+          radar_wireless_enemy_robot_pos_pub_.publish(enemy_robot_pos_data);
+          break;
+        }
+        case rm_referee::RADAR_WIRELESS_ENEMY_ROBOT_HP_CMD:
+        {
+          rm_referee::RadarWirelessEnemyRobotHp enemy_robot_hp_ref;
+          rm_msgs::RadarWirelessEnemyRobotHp enemy_robot_hp_data;
+          memcpy(&enemy_robot_hp_ref, rx_data + 7, sizeof(rm_referee::RadarWirelessEnemyRobotHp));
+          enemy_robot_hp_data.hero_hp = enemy_robot_hp_ref.hero_hp;
+          enemy_robot_hp_data.engineer_hp = enemy_robot_hp_ref.engineer_hp;
+          enemy_robot_hp_data.infantry_3_hp = enemy_robot_hp_ref.infantry_3_hp;
+          enemy_robot_hp_data.infantry_4_hp = enemy_robot_hp_ref.infantry_4_hp;
+          enemy_robot_hp_data.reserved = enemy_robot_hp_ref.reserved;
+          enemy_robot_hp_data.sentry_hp = enemy_robot_hp_ref.sentry_hp;
+          enemy_robot_hp_data.stamp = last_get_data_time_;
+          radar_wireless_enemy_robot_hp_pub_.publish(enemy_robot_hp_data);
+          break;
+        }
+        case rm_referee::RADAR_WIRELESS_ENEMY_PROJECTILE_ALLOWANCE_CMD:
+        {
+          rm_referee::RadarWirelessEnemyProjectileAllowance enemy_projectile_allowance_ref;
+          rm_msgs::RadarWirelessEnemyProjectileAllowance enemy_projectile_allowance_data;
+          memcpy(&enemy_projectile_allowance_ref, rx_data + 7,
+                 sizeof(rm_referee::RadarWirelessEnemyProjectileAllowance));
+          enemy_projectile_allowance_data.hero_projectile_allowance =
+              enemy_projectile_allowance_ref.hero_projectile_allowance;
+          enemy_projectile_allowance_data.infantry_3_projectile_allowance =
+              enemy_projectile_allowance_ref.infantry_3_projectile_allowance;
+          enemy_projectile_allowance_data.infantry_4_projectile_allowance =
+              enemy_projectile_allowance_ref.infantry_4_projectile_allowance;
+          enemy_projectile_allowance_data.aerial_projectile_allowance =
+              enemy_projectile_allowance_ref.aerial_projectile_allowance;
+          enemy_projectile_allowance_data.sentry_projectile_allowance =
+              enemy_projectile_allowance_ref.sentry_projectile_allowance;
+          enemy_projectile_allowance_data.stamp = last_get_data_time_;
+          radar_wireless_enemy_projectile_allowance_pub_.publish(enemy_projectile_allowance_data);
+          break;
+        }
+        case rm_referee::RADAR_WIRELESS_ENEMY_COIN_AND_FIELD_STATUS_CMD:
+        {
+          rm_referee::RadarWirelessEnemyCoinAndFieldStatus enemy_coin_and_field_status_ref;
+          rm_msgs::RadarWirelessEnemyCoinAndFieldStatus enemy_coin_and_field_status_data;
+          memcpy(&enemy_coin_and_field_status_ref, rx_data + 7,
+                 sizeof(rm_referee::RadarWirelessEnemyCoinAndFieldStatus));
+          enemy_coin_and_field_status_data.remaining_coin = enemy_coin_and_field_status_ref.remaining_coin;
+          enemy_coin_and_field_status_data.total_coin = enemy_coin_and_field_status_ref.total_coin;
+          enemy_coin_and_field_status_data.field_status = enemy_coin_and_field_status_ref.field_status;
+          enemy_coin_and_field_status_data.stamp = last_get_data_time_;
+          radar_wireless_enemy_coin_and_field_status_pub_.publish(enemy_coin_and_field_status_data);
+          break;
+        }
+        case rm_referee::RADAR_WIRELESS_ENEMY_ROBOT_BUFF_CMD:
+        {
+          rm_referee::RadarWirelessEnemyRobotBuff enemy_robot_buff_ref;
+          rm_msgs::RadarWirelessEnemyRobotBuff enemy_robot_buff_data;
+          memcpy(&enemy_robot_buff_ref, rx_data + 7, sizeof(rm_referee::RadarWirelessEnemyRobotBuff));
+          enemy_robot_buff_data.hero_recovery_buff = enemy_robot_buff_ref.hero_recovery_buff;
+          enemy_robot_buff_data.hero_cooling_buff = enemy_robot_buff_ref.hero_cooling_buff;
+          enemy_robot_buff_data.hero_defense_buff = enemy_robot_buff_ref.hero_defense_buff;
+          enemy_robot_buff_data.hero_negative_defense_buff = enemy_robot_buff_ref.hero_negative_defense_buff;
+          enemy_robot_buff_data.hero_attack_buff = enemy_robot_buff_ref.hero_attack_buff;
+          enemy_robot_buff_data.engineer_recovery_buff = enemy_robot_buff_ref.engineer_recovery_buff;
+          enemy_robot_buff_data.engineer_cooling_buff = enemy_robot_buff_ref.engineer_cooling_buff;
+          enemy_robot_buff_data.engineer_defense_buff = enemy_robot_buff_ref.engineer_defense_buff;
+          enemy_robot_buff_data.engineer_negative_defense_buff = enemy_robot_buff_ref.engineer_negative_defense_buff;
+          enemy_robot_buff_data.engineer_attack_buff = enemy_robot_buff_ref.engineer_attack_buff;
+          enemy_robot_buff_data.infantry_3_recovery_buff = enemy_robot_buff_ref.infantry_3_recovery_buff;
+          enemy_robot_buff_data.infantry_3_cooling_buff = enemy_robot_buff_ref.infantry_3_cooling_buff;
+          enemy_robot_buff_data.infantry_3_defense_buff = enemy_robot_buff_ref.infantry_3_defense_buff;
+          enemy_robot_buff_data.infantry_3_negative_defense_buff =
+              enemy_robot_buff_ref.infantry_3_negative_defense_buff;
+          enemy_robot_buff_data.infantry_3_attack_buff = enemy_robot_buff_ref.infantry_3_attack_buff;
+          enemy_robot_buff_data.infantry_4_recovery_buff = enemy_robot_buff_ref.infantry_4_recovery_buff;
+          enemy_robot_buff_data.infantry_4_cooling_buff = enemy_robot_buff_ref.infantry_4_cooling_buff;
+          enemy_robot_buff_data.infantry_4_defense_buff = enemy_robot_buff_ref.infantry_4_defense_buff;
+          enemy_robot_buff_data.infantry_4_negative_defense_buff =
+              enemy_robot_buff_ref.infantry_4_negative_defense_buff;
+          enemy_robot_buff_data.infantry_4_attack_buff = enemy_robot_buff_ref.infantry_4_attack_buff;
+          enemy_robot_buff_data.sentry_recovery_buff = enemy_robot_buff_ref.sentry_recovery_buff;
+          enemy_robot_buff_data.sentry_cooling_buff = enemy_robot_buff_ref.sentry_cooling_buff;
+          enemy_robot_buff_data.sentry_defense_buff = enemy_robot_buff_ref.sentry_defense_buff;
+          enemy_robot_buff_data.sentry_negative_defense_buff = enemy_robot_buff_ref.sentry_negative_defense_buff;
+          enemy_robot_buff_data.sentry_attack_buff = enemy_robot_buff_ref.sentry_attack_buff;
+          enemy_robot_buff_data.sentry_posture = enemy_robot_buff_ref.sentry_posture;
+          enemy_robot_buff_data.stamp = last_get_data_time_;
+          radar_wireless_enemy_robot_buff_pub_.publish(enemy_robot_buff_data);
+          break;
+        }
+        case rm_referee::RADAR_WIRELESS_ENEMY_CALL_SIGN_CMD:
+        {
+          rm_referee::RadarWirelessEnemyCallSign enemy_call_sign_ref;
+          rm_msgs::RadarWirelessEnemyCallSign enemy_call_sign_data;
+          memcpy(&enemy_call_sign_ref, rx_data + 7, sizeof(rm_referee::RadarWirelessEnemyCallSign));
+          for (int i = 0; i < 6; ++i)
+            enemy_call_sign_data.ascii_data[i] = enemy_call_sign_ref.ascii_data[i];
+          enemy_call_sign_data.stamp = last_get_data_time_;
+          radar_wireless_enemy_call_sign_pub_.publish(enemy_call_sign_data);
+          break;
+        }
+        case rm_referee::POWER_MANAGEMENT_SAMPLE_AND_STATUS_DATA_CMD:
+        {
+          rm_msgs::PowerManagementSampleAndStatusData sample_and_status_pub_data;
+          uint8_t data[sizeof(rm_referee::PowerManagementSampleAndStatusData)];
+          memcpy(&data, rx_data + 7, sizeof(rm_referee::PowerManagementSampleAndStatusData));
+          sample_and_status_pub_data.chassis_power = (static_cast<uint16_t>((data[0] << 8) | data[1]) / 100.);
+          sample_and_status_pub_data.chassis_expect_power = (static_cast<uint16_t>((data[2] << 8) | data[3]) / 100.);
+          sample_and_status_pub_data.capacity_recent_charge_power =
+              (static_cast<uint16_t>((data[4] << 8) | data[5]) / 100.);
+          sample_and_status_pub_data.capacity_remain_charge =
+              (static_cast<uint16_t>((data[6] << 8) | data[7]) / 10000.);
+          sample_and_status_pub_data.capacity_discharge_power = static_cast<uint8_t>(data[8]);
+          sample_and_status_pub_data.state_machine_running_state = base_.capacity_recent_mode_ =
+              static_cast<uint8_t>(data[9] >> 4);
+          sample_and_status_pub_data.power_management_protection_info = static_cast<uint8_t>((data[9] >> 2) & 0x03);
+          sample_and_status_pub_data.power_management_topology = static_cast<uint8_t>(data[9] & 0x03);
+          sample_and_status_pub_data.stamp = last_get_data_time_;
+
+          referee_ui_.capacityDataCallBack(sample_and_status_pub_data, last_get_data_time_);
+
+          power_management_sample_and_status_data_pub_.publish(sample_and_status_pub_data);
+          break;
+        }
+        case rm_referee::POWER_MANAGEMENT_INITIALIZATION_EXCEPTION_CMD:
+        {
+          rm_referee::PowerManagementInitializationExceptionData initialization_exception_ref;
+          rm_msgs::PowerManagementInitializationExceptionData initialization_exception_pub_data;
+          memcpy(&initialization_exception_ref, rx_data + 7,
+                 sizeof(rm_referee::PowerManagementInitializationExceptionData));
+
+          initialization_exception_pub_data.error_code = initialization_exception_ref.error_code;
+          initialization_exception_pub_data.string = initialization_exception_ref.string;
+          initialization_exception_pub_data.stamp = last_get_data_time_;
+          power_management_initialization_exception_pub_.publish(initialization_exception_pub_data);
+          break;
+        }
+        case rm_referee::POWER_MANAGEMENT_SYSTEM_EXCEPTION_CMD:
+        {
+          unsigned char* tmp_rx_data_ptr = rx_data + 7;
+          rm_msgs::PowerManagementSystemExceptionData system_exception_pub_data;
+
+          system_exception_pub_data.r0 =
+              tmp_rx_data_ptr[0] << 24 | tmp_rx_data_ptr[1] << 16 | tmp_rx_data_ptr[2] << 8 | tmp_rx_data_ptr[3];
+          system_exception_pub_data.r1 =
+              tmp_rx_data_ptr[4] << 24 | tmp_rx_data_ptr[5] << 16 | tmp_rx_data_ptr[6] << 8 | tmp_rx_data_ptr[7];
+          system_exception_pub_data.r2 =
+              tmp_rx_data_ptr[8] << 24 | tmp_rx_data_ptr[9] << 16 | tmp_rx_data_ptr[10] << 8 | tmp_rx_data_ptr[11];
+          system_exception_pub_data.r3 =
+              tmp_rx_data_ptr[12] << 24 | tmp_rx_data_ptr[13] << 16 | tmp_rx_data_ptr[14] << 8 | tmp_rx_data_ptr[15];
+          system_exception_pub_data.r12 =
+              tmp_rx_data_ptr[16] << 24 | tmp_rx_data_ptr[17] << 16 | tmp_rx_data_ptr[18] << 8 | tmp_rx_data_ptr[19];
+          system_exception_pub_data.LR =
+              tmp_rx_data_ptr[20] << 24 | tmp_rx_data_ptr[21] << 16 | tmp_rx_data_ptr[22] << 8 | tmp_rx_data_ptr[23];
+          system_exception_pub_data.PC =
+              tmp_rx_data_ptr[24] << 24 | tmp_rx_data_ptr[25] << 16 | tmp_rx_data_ptr[26] << 8 | tmp_rx_data_ptr[27];
+          system_exception_pub_data.PSR =
+              tmp_rx_data_ptr[28] << 24 | tmp_rx_data_ptr[29] << 16 | tmp_rx_data_ptr[30] << 8 | tmp_rx_data_ptr[31];
+          system_exception_pub_data.stamp = last_get_data_time_;
+          power_management_system_exception_data_.publish(system_exception_pub_data);
+          break;
+        }
+        case rm_referee::POWER_MANAGEMENT_PROCESS_STACK_OVERFLOW_CMD:
+        {
+          rm_referee::PowerManagementProcessStackOverflowData stack_overflow_ref;
+          rm_msgs::PowerManagementProcessStackOverflowData stack_overflow_pub_data;
+          memcpy(&stack_overflow_ref, rx_data + 7, sizeof(rm_referee::PowerManagementProcessStackOverflowData));
+
+          stack_overflow_pub_data.process_name = stack_overflow_ref.process_name;
+          stack_overflow_pub_data.stamp = last_get_data_time_;
+          power_management_process_stack_overflow_pub_.publish(stack_overflow_pub_data);
+        }
+        case rm_referee::POWER_MANAGEMENT_UNKNOWN_EXCEPTION_CMD:
+        {
+          rm_referee::PowerManagementUnknownExceptionData unknown_exception_ref;
+          rm_msgs::PowerManagementUnknownExceptionData unknown_exception_pub_data;
+          memcpy(&unknown_exception_ref, rx_data + 7, sizeof(rm_referee::PowerManagementUnknownExceptionData));
+
+          unknown_exception_pub_data.abnormal_reset_reason = unknown_exception_ref.abnormal_reset_reason;
+          unknown_exception_pub_data.power_management_before_reset_topology =
+              unknown_exception_ref.power_management_before_reset_topology;
+          unknown_exception_pub_data.state_machine_before_reset_mode =
+              unknown_exception_ref.state_machine_before_reset_mode;
+          unknown_exception_pub_data.stamp = last_get_data_time_;
+          power_management_unknown_exception_pub_.publish(unknown_exception_pub_data);
+          break;
+        }
+        default:
+          ROS_WARN("Referee command ID %d not found.", cmd_id);
+          break;
+      }
+      base_.referee_data_is_online_ = true;
+      last_get_data_time_ = ros::Time::now();
+      return frame_len;
+    }
+  }
+  return -1;
+}
+
+void Referee::getRobotInfo()
+{
+  base_.robot_color_ = base_.robot_id_ >= 100 ? "blue" : "red";
+  switch (base_.robot_id_)
+  {
+    case rm_referee::RobotId::BLUE_HERO:
+      base_.client_id_ = rm_referee::ClientId::BLUE_HERO_CLIENT;
+      break;
+    case rm_referee::RobotId::BLUE_ENGINEER:
+      base_.client_id_ = rm_referee::ClientId::BLUE_ENGINEER_CLIENT;
+      break;
+    case rm_referee::RobotId::BLUE_STANDARD_3:
+      base_.client_id_ = rm_referee::ClientId::BLUE_STANDARD_3_CLIENT;
+      break;
+    case rm_referee::RobotId::BLUE_STANDARD_4:
+      base_.client_id_ = rm_referee::ClientId::BLUE_STANDARD_4_CLIENT;
+      break;
+    case rm_referee::RobotId::BLUE_STANDARD_5:
+      base_.client_id_ = rm_referee::ClientId::BLUE_STANDARD_5_CLIENT;
+      break;
+    case rm_referee::RobotId::BLUE_AERIAL:
+      base_.client_id_ = rm_referee::ClientId::BLUE_AERIAL_CLIENT;
+      break;
+    case rm_referee::RobotId::RED_HERO:
+      base_.client_id_ = rm_referee::ClientId::RED_HERO_CLIENT;
+      break;
+    case rm_referee::RobotId::RED_ENGINEER:
+      base_.client_id_ = rm_referee::ClientId::RED_ENGINEER_CLIENT;
+      break;
+    case rm_referee::RobotId::RED_STANDARD_3:
+      base_.client_id_ = rm_referee::ClientId::RED_STANDARD_3_CLIENT;
+      break;
+    case rm_referee::RobotId::RED_STANDARD_4:
+      base_.client_id_ = rm_referee::ClientId::RED_STANDARD_4_CLIENT;
+      break;
+    case rm_referee::RobotId::RED_STANDARD_5:
+      base_.client_id_ = rm_referee::ClientId::RED_STANDARD_5_CLIENT;
+      break;
+    case rm_referee::RobotId::RED_AERIAL:
+      base_.client_id_ = rm_referee::ClientId::RED_AERIAL_CLIENT;
+      break;
+    case rm_referee::RobotId::BLUE_SENTRY:
+      base_.client_id_ = rm_referee::ClientId::BLUE_AERIAL_CLIENT;
+      break;
+    case rm_referee::RobotId::RED_SENTRY:
+      base_.client_id_ = rm_referee::ClientId::RED_AERIAL_CLIENT;
+      break;
+    case rm_referee::RobotId::RED_RADAR:
+      base_.client_id_ = rm_referee::ClientId::RED_AERIAL_CLIENT;
+      break;
+    case rm_referee::RobotId::BLUE_RADAR:
+      base_.client_id_ = rm_referee::ClientId::BLUE_AERIAL_CLIENT;
+      break;
+  }
+}
+}  // namespace rm_referee

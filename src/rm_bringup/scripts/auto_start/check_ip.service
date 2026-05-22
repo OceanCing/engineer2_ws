@@ -1,0 +1,9 @@
+[Unit]
+Description=Check IP and Restart Services
+After=start_master.service
+[Service]
+User=dynamicx
+Type=simple
+ExecStart=/bin/bash -c "/home/dynamicx/check_ip.sh"
+[Install]
+WantedBy=multi-user.target

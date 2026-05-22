@@ -1,0 +1,4 @@
+rm_engineer/engineer_arm_config
+/home/dynamicx/engineer2_ws/devel/.private/engineer_arm_config/lib/pkgconfig/engineer_arm_config.pc /home/dynamicx/engineer2_ws/devel/lib/pkgconfig/engineer_arm_config.pc
+/home/dynamicx/engineer2_ws/devel/.private/engineer_arm_config/share/engineer_arm_config/cmake/engineer_arm_configConfig-version.cmake /home/dynamicx/engineer2_ws/devel/share/engineer_arm_config/cmake/engineer_arm_configConfig-version.cmake
+/home/dynamicx/engineer2_ws/devel/.private/engineer_arm_config/share/engineer_arm_config/cmake/engineer_arm_configConfig.cmake /home/dynamicx/engineer2_ws/devel/share/engineer_arm_config/cmake/engineer_arm_configConfig.cmake

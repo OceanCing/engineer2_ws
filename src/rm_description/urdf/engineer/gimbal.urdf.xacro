@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="gimbal">
+    <!-- safety_distance: Minimum safety distance in [m] by which the collision volumes are expanded and which is enforced during robot motions -->
+    <xacro:macro name="gimbal" params="connected_to:='' xyz:='0 0 0' rpy:='0 0 0' simulation">
+
+        <xacro:property name="threshold" value="0.05"/>
+        <xacro:property name="yaw_lower_limit" value="-1e10"/>
+        <xacro:property name="yaw_upper_limit" value="1e10"/>
+        <xacro:property name="lifter_upper_limit" value="0.284"/>
+        <xacro:property name="lifter_lower_limit" value="0.005"/>
+
+
+        <link name="gimbal_lifter">
+            <inertial>
+                <mass value="1.572037"/>
+                <origin xyz="-0.229542 0.009594 0.468196"/>
+                <inertia ixx="4.348e-2" ixy="-3.315e-4" ixz="-1.452e-4" iyy="2.568e-2"
+                         iyz="-2.689e-3" izz="1.940e-2"/>
+            </inertial>
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer/gimbal_lifter.stl" />
+                </geometry>
+            </visual>
+        </link>
+
+
+        <link name="yaw">
+            <inertial>
+                <mass value="0.137082"/>
+                <origin xyz="-0.255155 0.000025 0.564144"/>
+                <inertia ixx="5.3163058e-5" ixy="-2.539e-8" ixz="-5.276475e-6" iyy="1.436e-4"
+                         iyz="-8.2892e-8" izz="1.655e-4"/>
+            </inertial>
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer/yaw.stl" />
+                </geometry>
+            </visual>
+        </link>
+
+        <link name="pitch">
+            <inertial>
+                <mass value="0.0001"/>
+                <origin xyz="0 0 0"/>
+                <inertia ixx="1.0e-8" ixy="0" ixz="0" iyy="1.0e-8" iyz="0" izz="1.0e-8"/>
+            </inertial>
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://rm_description/meshes/engineer/pitch.stl" />
+                </geometry>
+            </visual>
+        </link>
+
+        <joint name="gimbal_lifter_joint" type="prismatic">
+            <origin xyz="-0.248  0. 0.103 " rpy="0 0 0"/>
+            <limit effort="50" velocity="0.6" lower="${lifter_lower_limit}" upper="${lifter_upper_limit}"/>
+            <parent link="${connected_to}"/>
+            <child link="gimbal_lifter"/>
+            <axis xyz="0 0 1 "/>
+        </joint>
+
+        <joint name="pitch_joint" type="revolute">
+            <origin xyz="0.020906 0 0.459" rpy="0 0 0"/>
+            <limit effort="0" velocity="0" lower="-0.0001" upper="0.0001"/>
+            <parent link="gimbal_lifter"/>
+            <child link="pitch"/>
+            <axis xyz="0 1 0"/>
+        </joint>"
+
+
+        <joint name="yaw_joint" type="revolute">
+            <origin xyz="0.020906 0 0.462"
+                    rpy="0 0 0"/>
+            <limit effort="1.2" velocity="50" lower="${yaw_lower_limit}" upper="${yaw_upper_limit}"/>
+            <parent link="gimbal_lifter"/>
+            <child link="yaw"/>
+            <axis xyz="0 0 1"/>
+        </joint>
+
+        <transmission name="trans_pitch_joint">
+            <type>transmission_interface/SimpleTransmission</type>
+            <actuator name="pitch_joint_motor">
+                <mechanicalReduction>1</mechanicalReduction>
+            </actuator>
+            <joint name="pitch_joint">
+                <offset>0.</offset>
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            </joint>
+        </transmission>
+
+
+        <transmission name="trans_yaw_joint">
+            <type>transmission_interface/SimpleTransmission</type>
+            <actuator name="yaw_joint_motor">
+                <mechanicalReduction>1</mechanicalReduction>
+            </actuator>
+            <joint name="yaw_joint">
+                <offset>-0.484</offset>
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            </joint>
+        </transmission>
+
+        <transmission name="trans_gimbal_lifter_joint">
+            <type>transmission_interface/SimpleTransmission</type>
+            <actuator name="gimbal_lifter_joint_motor">
+                <mechanicalReduction>1800</mechanicalReduction>
+            </actuator>
+            <joint name="gimbal_lifter_joint">
+                <offset>0.</offset>
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            </joint>
+        </transmission>
+
+
+
+    </xacro:macro>
+</robot>

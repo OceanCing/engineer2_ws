@@ -1,0 +1,10 @@
+<library path="lib/libengineer_lifter_controller">
+  <!-- controller_interface types -->
+  <class name="engineer_lifter_controller/EngineerLifterController"
+         type="engineer_lifter_controller::EngineerLifterController"
+         base_class_type="controller_interface::ControllerBase">
+    <description>
+        The lifter controller for robot engineer
+    </description>
+  </class>
+</library>

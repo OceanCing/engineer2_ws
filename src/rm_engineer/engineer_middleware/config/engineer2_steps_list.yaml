@@ -1,0 +1,750 @@
+common:
+  speed:
+    slowly: &SLOWLY
+      speed: 0.3
+      accel: 0.1
+      timeout: 15.
+    normally: &NORMALLY
+      speed: 0.5
+      accel: 0.4
+      timeout: 6.
+    quickly: &QUICKLY
+      speed: 0.8
+      accel: 0.6
+      timeout: 5.
+    maximum: &MAXIMUM
+      speed: 1.0
+      accel: 1.0
+      timeout: 4.
+
+  tolerance:
+    small_tolerance: &SMALL_TOLERANCE
+      tolerance_joints: [ 0.005, 0.02, 0.01, 0.02, 0.02, 0.02, 0.02 ]
+    normal_tolerance: &NORMAL_TOLERANCE
+      tolerance_joints: [ 0.012, 0.03, 0.03, 0.04, 0.04, 0.03, 0.03 ]
+    bigger_tolerance: &BIGGER_TOLERANCE
+      tolerance_joints: [ 0.015, 0.05, 0.06, 0.08, 0.06, 0.07, 0.05 ]
+    max_tolerance: &MAX_TOLERANCE
+      tolerance_joints: [ 0.02, 0.08, 0.07, 0.1, 0.07, 0.07, 0.06 ]
+
+  joint1:
+    home: &JOINT1_HOME_POS
+      0.121
+
+  joint2:
+    home: &JOINT2_HOME_POS
+      1.553
+
+  joint3:
+    home: &JOINT3_HOME_POS
+      -1.06
+
+  joint4:
+    home: &JOINT4_HOME_POS
+      1.007
+
+  joint5:
+    home: &JOINT5_HOME_POS
+      -0.033
+
+  joint6:
+    home: &JOINT6_HOME_POS
+      0.197
+
+  joint7:
+    home: &JOINT7_HOME_POS
+      0.0001
+
+  arm:
+    home: &HOME
+      joints: [ *JOINT1_HOME_POS, *JOINT2_HOME_POS, *JOINT3_HOME_POS, *JOINT4_HOME_POS, *JOINT5_HOME_POS, *JOINT6_HOME_POS,  *JOINT7_HOME_POS]
+      common:
+        <<: *NORMALLY
+      tolerance:
+        <<: *NORMAL_TOLERANCE
+    ready_assemble: &READY_ASSEMBLE
+      joints: [ 0.43, 0.001, *JOINT3_HOME_POS, *JOINT4_HOME_POS, *JOINT5_HOME_POS, *JOINT6_HOME_POS,  *JOINT7_HOME_POS ]
+      common:
+        <<: *NORMALLY
+      tolerance:
+        <<: *BIGGER_TOLERANCE
+
+  gimbal:
+    right_pos: &RIGHT_POS
+      frame: base_link
+      position: [ 0.00 , -3., 0. ]
+    left_pos: &LEFT_POS
+      frame: base_link
+      position: [ 0.001, 3., 0. ]
+    front_pos: &FRONT_POS
+      frame: base_link
+      position: [ 3., -0.3, 0. ]
+    back_pos: &BACK_POS
+      frame: base_link
+      position: [ -3., -0.3, 0. ]
+    follow_ee: &FOLLOW_EE
+      frame: gripper_link
+      position: [ 0.20, 0.00, 0. ]
+
+  gripper:
+    open_gripper: &OPEN_GRIPPER
+      command: false
+    clode_gripper: &CLOSE_GRIPPER
+      command: true
+
+
+  chassis:
+    chassis_left: &CHASSIS_LEFT_30
+      frame: base_link
+      position: [ 0.0, 0.30 ]
+      yaw: 0.0
+      chassis_tolerance_position: 0.05
+      chassis_tolerance_angular: 0.1
+      common:
+        timeout: 6.
+#    chassis_left_60: &CHASSIS_LEFT_70
+#      frame: base_link
+#      position: [ 0.0, 0.7 ]
+#      yaw: 0.0
+#      chassis_tolerance_position: 0.1
+#      chassis_tolerance_angular: 0.2
+#      common:
+#        timeout: 6.
+#    chassis_left60: &CHASSIS_LEFT_60
+#      frame: base_link
+#      position: [ 0.0, 0.6 ]
+#      yaw: 0.0
+#      chassis_tolerance_position: 0.1
+#      chassis_tolerance_angular: 0.2
+#      common:
+#        timeout: 6.
+#    chassis_left50: &CHASSIS_LEFT_50
+#      frame: base_link
+#      position: [ 0.0, 0.5 ]
+#      yaw: 0.0
+#      chassis_tolerance_position: 0.1
+#      chassis_tolerance_angular: 0.2
+#      common:
+#        timeout: 6.
+#    chassis_back_60: &CHASSIS_BACK_60
+#      frame: base_link
+#      position: [ -0.6, 0.0 ]
+#      yaw: 0.0
+#      chassis_tolerance_position: 0.1
+#      chassis_tolerance_angular: 0.2
+#      common:
+#        timeout: 6.
+#    chassis_turn_left: &CHASSIS_TURN_LEFT
+#      frame: base_link
+#      position: [ 0.0, 0.0 ]
+#      yaw: 1.57
+#      chassis_tolerance_position: 0.1
+#      chassis_tolerance_angular: 0.2
+#      common:
+#        timeout: 6.
+#    chassis_turn_right: &CHASSIS_TURN_RIGHT
+#      frame: base_link
+#      position: [ 0.0, 0.0 ]
+#      yaw: -1.07
+#      chassis_tolerance_position: 0.1
+#      chassis_tolerance_angular: 0.2
+#      common:
+#        timeout: 6.
+    chassis_turn_back: &CHASSIS_TURN_BACK
+      frame: base_link
+      position: [ 0.0, 0.0 ]
+      yaw: 3.14
+      chassis_tolerance_position: 0.1
+      chassis_tolerance_angular: 0.2
+      common:
+        timeout: 2.
+
+steps_list:
+  GIMBAL_F:
+    - step: "gimbal look front"
+      gimbal:
+        <<: *FRONT_POS
+
+  GIMBAL_R:
+    - step: "gimbal look right"
+      gimbal:
+        <<: *RIGHT_POS
+
+  GIMBAL_B:
+    - step: "gimbal look back"
+      gimbal:
+        <<: *BACK_POS
+  GIMBAL_EE:
+    - step: "gimbal follow ee"
+      gimbal:
+        <<: *FOLLOW_EE
+
+  CALIBRATION:
+    - step: "gimbal look front"
+      gimbal:
+        <<: *FRONT_POS
+
+  HOME:
+    - step: "arm home pos"
+      arm:
+        <<: *HOME
+#    - step: "gripper open"
+#      gripper:
+#        <<: *OPEN_GRIPPER
+#    - step: "gimbal look front"
+#      gimbal:
+#        <<: *FRONT_POS
+
+  LIFTER_INIT:
+    - step: "lifter init"
+      lifter:
+        state: 0
+  LIFTER_UP:
+    - step: "lifter up"
+      lifter:
+        state: 1
+  LIFTER_UP0:
+    - step: "lifter init"
+      lifter:
+        state: 0
+  LIFTER_DOWN:
+    - step: "lifter down"
+      lifter:
+        state: 2
+  LIFTER_DOWN0:
+    - step: "lifter init"
+      lifter:
+        state: 0
+
+  GRIPPER_OPEN:
+    - step: "gripper open"
+      gripper:
+        <<: *OPEN_GRIPPER
+
+  GRIPPER_CLOSE:
+    - step: "gripper close"
+      gripper:
+        <<: *CLOSE_GRIPPER
+#  TEST_PLAYBACK:
+#    - step: "test playback"
+#      trajectory_playback:
+#        filename: "/home/ch/rm_ws/src/rm_engineer/engineer_trajectory_teaching/trajectory/test.yaml"
+#        speed: 1.5
+#        sync_time: 0.5
+#
+  GET_UNITS_UP:
+    - step: "gripper open"
+      gripper:
+        <<: *OPEN_GRIPPER
+    - step: "arm ready get second unit"
+      arm:
+        joints: [ 0.215895, -0.003815, -0.312477, 0.193771, -1.581238, -0.002813, 2.618987 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *NORMAL_TOLERANCE
+  GET_UNITS_UP0:
+    - step: "gripper close"
+      gripper:
+        <<: *CLOSE_GRIPPER
+    - step: "arm up unit"
+      arm:
+        joints: [ 0.421690, 0.390625, -0.198036, 0.487916, -0.722261, -0.511475, 1.735095 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *NORMAL_TOLERANCE
+    - step: "chassis back"
+      chassis:
+        <<: *CHASSIS_LEFT_30
+    - step: "ready store"
+      arm:
+        joints: [ 0.445447, -2.713721, 0.194878, 0.043058, 1.530397, 1.536000, -2.027769 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *BIGGER_TOLERANCE
+    - step: "arm down unit"
+      arm:
+        joints: [ "KEEP", "KEEP", 0.768227, -0.149203, 1.362128, 1.536000, -2.259214 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *BIGGER_TOLERANCE
+    - step: "gripper open"
+      gripper:
+        <<: *OPEN_GRIPPER
+    - step: "arm leave unit"
+      arm:
+        joints: [ "KEEP", -2.3271, "KEEP", "KEEP", "KEEP", "KEEP", "KEEP" ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *NORMAL_TOLERANCE
+    - step: "arm ready get third unit"
+      arm:
+        joints: [ 0.214920, -0.003815, -0.312477, 0.172921, -1.596671, 0.0001, 0.583660 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *NORMAL_TOLERANCE
+  GET_UNITS_UP00:
+    - step: "gripper close"
+      gripper:
+        <<: *CLOSE_GRIPPER
+    - step: "arm up unit"
+      arm:
+        joints: [ 0.314685, -0.379, -0.226646, 0.074980, -1.414886, 0.153958, 0.366711 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *NORMAL_TOLERANCE
+    - step: "chassis back"
+      chassis:
+        <<: *CHASSIS_LEFT_30
+    - step: "ready store"
+      arm:
+        joints: [ 0.445447, -2.517585, -0.464470, 0.684690, 1.505160, 1.6, -1.960691 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *BIGGER_TOLERANCE
+    - step: "arm down unit"
+      arm:
+        joints: [ "KEEP", -2.517585, 0.194878, 0.788450, 1.525415, 1.6, -2.6 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *BIGGER_TOLERANCE
+    - step: "gripper open"
+      gripper:
+        <<: *OPEN_GRIPPER
+    - step: "arm leave unit"
+      arm:
+        joints: [ "KEEP", -1.855548, "KEEP", "KEEP", "KEEP", "KEEP", "KEEP" ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *NORMAL_TOLERANCE
+    - step: "ready pos"
+      arm:
+        joints: [ 0.307, -0.013888, -0.188118, 0.060229, -0.018521, -0.020241, 0.008777 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *NORMAL_TOLERANCE
+  GET_UNITS_UP000:
+    - step: "gripper close"
+      gripper:
+        <<: *CLOSE_GRIPPER
+    - step: "arm up unit"
+      arm:
+        joints: [ 0.405447, -0.013888, -0.217, -0.01, -0.018521, -0.05, 0.008777 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *BIGGER_TOLERANCE
+    - step: "chassis back"
+      chassis:
+        <<: *CHASSIS_LEFT_30
+    - step: "home"
+      arm:
+        <<: *HOME
+    - step: "chassis back"
+      chassis:
+        <<: *CHASSIS_TURN_BACK
+
+  GET_UNITS_DOWN:
+    - step: "gripper open"
+      gripper:
+        <<: *OPEN_GRIPPER
+    - step: "ready pos"
+      arm:
+        joints: [ 0.032178, -0.0028, -0.1699, 0.143689, -0.007022, -0.056858, 0.003342 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *NORMAL_TOLERANCE
+  GET_UNITS_DOWN0:
+    - step: "gripper close"
+      gripper:
+        <<: *CLOSE_GRIPPER
+    - step: "arm down unit"
+      arm:
+        joints: [ 0.003, "KEEP", 0.024193, 0.499239, -0.007022, -0.568923, 0.003342 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *NORMAL_TOLERANCE
+    - step: "chassis back"
+      chassis:
+        <<: *CHASSIS_LEFT_30
+    - step: "ready store"
+      arm:
+        joints: [ 0.445447, -2.72, 0.194878, 0.043058, 1.530397, 1.536000, 1.153721 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *BIGGER_TOLERANCE
+    - step: "arm down unit"
+      arm:
+        joints: [ "KEEP", "KEEP", 0.768227, -0.149203, 1.362128, 1.536000, 0.844977 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *BIGGER_TOLERANCE
+    - step: "gripper open"
+      gripper:
+        <<: *OPEN_GRIPPER
+    - step: "arm leave unit"
+      arm:
+        joints: [ "KEEP", -2.3271, "KEEP", "KEEP", "KEEP", "KEEP", "KEEP" ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *NORMAL_TOLERANCE
+    - step: "arm ready get second unit"
+      arm:
+        joints: [ 0.136601, -0.002062, -0.165398, 0.164752, 0.607200, -0.00001, 0.471600 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *NORMAL_TOLERANCE
+  GET_UNITS_DOWN00:
+    - step: "gripper close"
+      gripper:
+        <<: *CLOSE_GRIPPER
+    - step: "arm down unit"
+      arm:
+        joints: [ 0.130791, -0.460589, 0.141, 0.121, 0.624274, -0.601120, 0.583819 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *NORMAL_TOLERANCE
+    - step: "ready store"
+      arm:
+        joints: [ 0.445447, -2.517585, -0.464470, 0.684690, 1.505160, 1.6, 1.2576 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *BIGGER_TOLERANCE
+      chassis:
+        <<: *CHASSIS_LEFT_30
+    - step: "arm down unit"
+      arm:
+        joints: [ "KEEP", -2.517585, 0.194878, 0.764, 1.525415, 1.6, 0.539 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *BIGGER_TOLERANCE
+    - step: "gripper open"
+      gripper:
+        <<: *OPEN_GRIPPER
+    - step: "arm leave unit"
+      arm:
+        joints: [ "KEEP", -1.855548, "KEEP", "KEEP", "KEEP", "KEEP", "KEEP" ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *NORMAL_TOLERANCE
+    - step: "arm ready get third unit"
+      arm:
+        joints: [ 0.098978, -0.0028, -0.1699, 0.095101, 2.07, -0.0001, 0.025798 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *NORMAL_TOLERANCE
+  GET_UNITS_DOWN000:
+    - step: "gripper close"
+      gripper:
+        <<: *CLOSE_GRIPPER
+    - step: "arm down unit"
+      arm:
+        joints: [ 0.098978, 0.475, 0.116, 0.097, 2.07, 0.575391, -0.202378 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *NORMAL_TOLERANCE
+    - step: "home"
+      arm:
+        <<: *HOME
+    - step: "chassis back"
+      chassis:
+        <<: *CHASSIS_TURN_BACK
+
+  READY_ASSEMBLE:
+    - step: "ready assemble"
+      arm:
+        <<: *READY_ASSEMBLE
+
+  GET_STORED_FRONT:
+    - step: "gripper open"
+      gripper:
+        <<: *OPEN_GRIPPER
+    - step: "ready get stored front1"
+      arm:
+        joints: [ 0.445447, -1.638026, 0.163229, 0.5, 1.418200, 1.599, -2.6199 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *NORMAL_TOLERANCE
+    - step: "ready get stored front2"
+      arm:
+        joints: [ 0.445447, -1.638026, 0.163229, 0.791120, 1.418200, 1.599, -2.6199 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *NORMAL_TOLERANCE
+    - step: "arm forward unit"
+      arm:
+        joints: [ "KEEP", -2.459872, "KEEP", "KEEP", "KEEP", "KEEP", "KEEP" ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *NORMAL_TOLERANCE
+    - step: "gripper close"
+      gripper:
+        <<: *CLOSE_GRIPPER
+    - step: "arm up unit"
+      arm:
+        joints: [ "KEEP", -2.517585, -0.464470, 0.684690, 1.505160, 1.6, -1.960691 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *BIGGER_TOLERANCE
+    - step: "ready assemble"
+      arm:
+        <<: *READY_ASSEMBLE
+
+  GET_STORED_BACK:
+    - step: "gripper open"
+      gripper:
+        <<: *OPEN_GRIPPER
+    - step: "ready get stored back"
+      arm:
+        joints: [ 0.445447, -2.263069, 0.654099, -0.073931, 1.362128, 1.59, -2.306812 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *NORMAL_TOLERANCE
+    - step: "arm forward unit"
+      arm:
+        joints: [ "KEEP", -2.724, "KEEP", "KEEP", "KEEP", "KEEP", "KEEP" ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *NORMAL_TOLERANCE
+    - step: "gripper close"
+      gripper:
+        <<: *CLOSE_GRIPPER
+    - step: "arm up unit"
+      arm:
+        joints: [ "KEEP", -2.724, 0.194878, 0.043058, 1.530397, 1.566000, -2.027769 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *BIGGER_TOLERANCE
+    - step: "ready assemble"
+      arm:
+        <<: *READY_ASSEMBLE
+
+  STORE_UNIT_BACK:
+    - step: "ready assemble"
+      arm:
+        <<: *READY_ASSEMBLE
+    - step: "ready store"
+      arm:
+        joints: [ 0.445447, -2.733721, 0.194878, 0.043058, 1.530397, 1.536000, -2.027769 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *BIGGER_TOLERANCE
+  STORE_UNIT_BACK0:
+    - step: "arm down unit"
+      arm:
+        joints: [ 0.445447, -2.733721, 0.768227, -0.149203, 1.362128, 1.536000, -2.259214 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *BIGGER_TOLERANCE
+    - step: "gripper open"
+      gripper:
+        <<: *OPEN_GRIPPER
+    - step: "arm leave unit"
+      arm:
+        joints: [ "KEEP", -2.3271, "KEEP", "KEEP", "KEEP", "KEEP", "KEEP" ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *NORMAL_TOLERANCE
+    - step: "ready assemble"
+      arm:
+        <<: *READY_ASSEMBLE
+
+  STORE_UNIT_FRONT:
+    - step: "ready assemble"
+      arm:
+        <<: *READY_ASSEMBLE
+    - step: "ready store"
+      arm:
+        joints: [ 0.445447, -2.517585, -0.464470, 0.684690, 1.505160, 1.6, -1.960691 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *BIGGER_TOLERANCE
+  STORE_UNIT_FRONT0:
+    - step: "arm down unit"
+      arm:
+        joints: [ "KEEP", -2.517585, 0.194878, 0.788450, 1.525415, 1.6, -2.59 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *BIGGER_TOLERANCE
+    - step: "gripper open"
+      gripper:
+        <<: *OPEN_GRIPPER
+    - step: "arm leave unit"
+      arm:
+        joints: [ "KEEP", -1.855548, "KEEP", "KEEP", "KEEP", "KEEP", "KEEP" ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *NORMAL_TOLERANCE
+    - step: "ready assemble"
+      arm:
+        <<: *READY_ASSEMBLE
+
+  STORE_UNIT_BACK_R:
+    - step: "ready store"
+      arm:
+        joints: [ 0.445447, -2.733721, 0.194878, 0.043058, 1.530397, 1.536000, 1.153721 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *BIGGER_TOLERANCE
+  STORE_UNIT_BACK_R0:
+    - step: "arm down unit"
+      arm:
+        joints: [ 0.445447, -2.733721, 0.768227, -0.149203, 1.362128, 1.536000, 0.844977 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *BIGGER_TOLERANCE
+    - step: "gripper open"
+      gripper:
+        <<: *OPEN_GRIPPER
+    - step: "arm leave unit"
+      arm:
+        joints: [ "KEEP", -2.3271, "KEEP", "KEEP", "KEEP", "KEEP", "KEEP" ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *NORMAL_TOLERANCE
+    - step: "ready assemble"
+      arm:
+        <<: *READY_ASSEMBLE
+
+  STORE_UNIT_FRONT_R:
+    - step: "ready store"
+      arm:
+        joints: [ 0.445447, -2.517585, -0.464470, 0.684690, 1.505160, 1.6, 1.2576 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *BIGGER_TOLERANCE
+  STORE_UNIT_FRONT_R0:
+    - step: "arm down unit"
+      arm:
+        joints: [ "KEEP", -2.517585, 0.194878, 0.788450, 1.525415, 1.6, 0.539 ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *BIGGER_TOLERANCE
+    - step: "gripper open"
+      gripper:
+        <<: *OPEN_GRIPPER
+    - step: "arm leave unit"
+      arm:
+        joints: [ "KEEP", -1.855548, "KEEP", "KEEP", "KEEP", "KEEP", "KEEP" ]
+        common:
+          <<: *NORMALLY
+        tolerance:
+          <<: *NORMAL_TOLERANCE
+    - step: "ready assemble"
+      arm:
+        <<: *READY_ASSEMBLE
+
+
+
+  TEST_EE_MOTION0:
+    - step: "test ee motion"
+      arm:
+        end_effector:
+          tolerance_position: 0.05
+          tolerance_orientation: 0.1
+          frame: "link7"
+          xyz: [ 0.00, 0.00, 0.10 ]
+          rpy: [ 0.00, 0.00, 0.00 ]
+          cartesian: true
+        common:
+          <<: *NORMALLY
+  TEST_EE_MOTION1:
+    - step: "test ee motion"
+      arm:
+        end_effector:
+          tolerance_position: 0.05
+          tolerance_orientation: 0.1
+          frame: "link7"
+          xyz: [ 0.00, 0.10, 0.00 ]
+          rpy: [ 0.00, 0.00, 0.00 ]
+          cartesian: true
+        common:
+          <<: *NORMALLY
+  TEST_EE_MOTION2:
+    - step: "test ee motion"
+      arm:
+        end_effector:
+          tolerance_position: 0.05
+          tolerance_orientation: 0.1
+          frame: "link7"
+          xyz: [ 0.10, 0.00, 0.00 ]
+          rpy: [ 0.00, 0.00, 0.00 ]
+          cartesian: true
+        common:
+          <<: *NORMALLY
+  TEST_EE_MOTION3:
+    - step: "test ee motion"
+      arm:
+        end_effector:
+          tolerance_position: 0.05
+          tolerance_orientation: 0.1
+          frame: "link7"
+          xyz: [ 0.00, 0.00, -0.10 ]
+          rpy: [ 0.00, 0.00, 0.00 ]
+          cartesian: true
+        common:
+          <<: *NORMALLY
+  TEST_EE_MOTION4:
+    - step: "test ee motion"
+      arm:
+        end_effector:
+          tolerance_position: 0.05
+          tolerance_orientation: 0.1
+          frame: "link7"
+          xyz: [ 0.00, -0.10, 0.00 ]
+          rpy: [ 0.00, 0.00, 0.00 ]
+          cartesian: true
+        common:
+          <<: *NORMALLY
+  TEST_EE_MOTION5:
+    - step: "test ee motion"
+      arm:
+        end_effector:
+          tolerance_position: 0.05
+          tolerance_orientation: 0.1
+          frame: "link7"
+          xyz: [ -0.10, 0.00, 0.00 ]
+          rpy: [ 0.00, 0.00, 0.00 ]
+          cartesian: true
+        common:
+          <<: *NORMALLY

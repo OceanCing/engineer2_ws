@@ -1,0 +1,15 @@
+# ls /sys/class/tty/ttyUSB* -l
+# ls /sys/class/tty/ttyACM* -l
+# udevadm info -a -n /dev/ttyACM* | grep -E "idVendor|idProduct|bInterfaceNumber"
+# set the udev rule
+
+# use for usb2can
+# ACTION=="add",KERNELS=="3-4.1:1.0",SUBSYSTEMS=="usb",MODE:="0777",SYMLINK+="usbDbus"
+# ACTION=="add",KERNELS=="3-4.2:1.0",SUBSYSTEMS=="usb",MODE:="0777",SYMLINK+="usbReferee"
+
+# use for ecat
+# ACTION=="add",KERNELS=="3-9:1.0",SUBSYSTEM=="tty",SUBSYSTEMS=="usb",MODE:="0777",SYMLINK+="usbImagetran"
+# ACTION=="add",KERNELS=="3-9:1.2",SUBSYSTEM=="tty",SUBSYSTEMS=="usb",MODE:="0777",SYMLINK+="usbReferee"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="55d2", MODE="0666", ENV{ID_MM_DEVICE_IGNORE}="1"
+SUBSYSTEMS=="usb", ATTRS{bInterfaceNumber}=="00", MODE:="0666", SYMLINK+="usbImagetran"
+SUBSYSTEMS=="usb", ATTRS{bInterfaceNumber}=="02", MODE:="0666", SYMLINK+="usbReferee"

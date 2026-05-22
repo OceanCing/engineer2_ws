@@ -1,0 +1,9 @@
+<launch>
+<!--     <param name="z_max" value="20.0" /> -->
+    <node pkg="nodelet" type="nodelet" name="record_pointcloud_manager" args="manager" output="screen"/>
+    <include file="$(find rgbd_pcl)/launch/record_pointcloud_camera.launch" />
+
+    <node pkg="nodelet" type="nodelet" name="record_pointcloud" args="load rgbd_pcl/RecordPointCloudNodelet record_pointcloud_manager" output="screen"/>
+    <rosparam command="load" file="$(find rgbd_pcl)/config/param.yaml" />
+
+</launch>

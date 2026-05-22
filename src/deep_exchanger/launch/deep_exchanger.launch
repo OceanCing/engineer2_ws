@@ -1,0 +1,11 @@
+<launch>
+
+<node pkg="nodelet" type="nodelet" name="engineer_nodelet_manager"  args="manager" output="screen"/>
+
+<node pkg="nodelet" type="nodelet" name="deep_exchanger" args="load deep_exchanger/DeepExchanger engineer_nodelet_manager" output="screen">
+    <param name="model_path" type="string" value="$(find deep_exchanger)/model/s_416.xml"/>
+    <param name="red" type="int" value="1" />
+<!--    <remap from="/galaxy_camera/image_raw" to="/hk_camera/image_raw"/> &ndash;&gt;-->
+</node>
+
+</launch>

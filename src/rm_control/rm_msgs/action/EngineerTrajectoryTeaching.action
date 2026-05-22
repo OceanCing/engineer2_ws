@@ -1,0 +1,20 @@
+# goal
+uint8 RECORD = 0
+uint8 PLAYBACK = 1
+
+bool command
+string filename
+float64 speed
+float64 sync_time
+---
+# result
+bool succeed
+---
+# feedback
+uint8 STOP = 0
+uint8 START = 1
+
+string mode
+bool state
+float64 time_from_start
+string text

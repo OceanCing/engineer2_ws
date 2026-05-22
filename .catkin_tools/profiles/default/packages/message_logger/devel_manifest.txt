@@ -1,0 +1,7 @@
+message_logger
+/home/dynamicx/engineer2_ws/devel/.private/message_logger/lib/libmessage_logger.so /home/dynamicx/engineer2_ws/devel/lib/libmessage_logger.so
+/home/dynamicx/engineer2_ws/devel/.private/message_logger/lib/message_logger/demo /home/dynamicx/engineer2_ws/devel/lib/message_logger/demo
+/home/dynamicx/engineer2_ws/devel/.private/message_logger/lib/pkgconfig/message_logger.pc /home/dynamicx/engineer2_ws/devel/lib/pkgconfig/message_logger.pc
+/home/dynamicx/engineer2_ws/devel/.private/message_logger/share/message_logger/cmake/message_loggerConfig-version.cmake /home/dynamicx/engineer2_ws/devel/share/message_logger/cmake/message_loggerConfig-version.cmake
+/home/dynamicx/engineer2_ws/devel/.private/message_logger/share/message_logger/cmake/message_loggerConfig.cmake /home/dynamicx/engineer2_ws/devel/share/message_logger/cmake/message_loggerConfig.cmake
+/home/dynamicx/engineer2_ws/devel/.private/message_logger/include/message_logger/log/log_messages_backend_config.hpp /home/dynamicx/engineer2_ws/devel/include/message_logger/log/log_messages_backend_config.hpp

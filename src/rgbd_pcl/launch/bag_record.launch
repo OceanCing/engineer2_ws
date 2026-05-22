@@ -1,0 +1,15 @@
+<launch>
+    <node pkg="nodelet" type="nodelet" name="bag_record"
+    args="manager" output="screen" respawn="true"/>
+
+    <include file="$(find rgbd_pcl)/launch/record_pointcloud_camera.launch">
+        <arg name="color_exposure" value="2"/>
+<!--         <arg name="color_exposure" value="8"/> -->
+
+    </include>
+
+<!--     <include file="$(find rgbd_pcl)/launch/side_camera.launch"> -->
+<!--         <arg name="manager_name" value="bag_record"/> -->
+<!--     </include> -->
+
+</launch>
