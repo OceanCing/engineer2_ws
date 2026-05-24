@@ -1,0 +1,41 @@
+{
+    "cmake.sourceDirectory": "/home/dynamicx/engineer2_ws/src"
+
+    "workbench.colorCustomizations": {
+        "editor.background": "#22222280",
+        "workbench.editor.background": "#1E1E1E80"
+    },
+
+    "urdf-visualizer.packages": {
+        "rm_description": "${workspaceFolder}/src/rm_description"
+    },
+
+    // Clangd configuration
+    "[cpp]": {
+        "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",
+        "editor.formatOnSave": false
+    },
+    "[c]": {
+        "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",
+        "editor.formatOnSave": false
+    },
+    "clangd.arguments": [
+        "--all-scopes-completion",
+        "--background-index",
+        "--clang-tidy",
+        "--completion-style=detailed",
+        "--cross-file-rename",
+        "--header-insertion=iwyu",
+        "--compile-commands-dir=build",
+        "-j=4"
+    ],
+    "clangd.fallbackFlags": [
+        "-std=c++14",
+        "-I/opt/ros/noetic/include",
+        "-I/home/dynamicx/engineer2_ws/devel/include",
+        "-I/home/dynamicx/engineer2_ws/src",
+        "-I/usr/include/eigen3"
+    ],
+    "clangd.checkUpdates": false,
+    "editor.inlayHints.enabled": "offUnlessPressed"
+}
