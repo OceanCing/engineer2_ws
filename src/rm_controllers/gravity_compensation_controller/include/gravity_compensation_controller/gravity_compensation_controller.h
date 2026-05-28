@@ -40,7 +40,7 @@ private:
   KDL::Chain chain_;
   std::unique_ptr<KDL::ChainDynParam> solver_;
   KDL::JntArray joint_positions_;
-  std::map<std::string, hardware_interface::JointStateHandle> joint_states_;
+  // std::map<std::string, hardware_interface::JointStateHandle> joint_states_;
 };
 } // namespace gravity_compensation_controller
 
