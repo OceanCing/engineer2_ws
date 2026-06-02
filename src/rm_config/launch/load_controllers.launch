@@ -12,6 +12,7 @@
           controllers/joint_state_controller
           controllers/robot_state_controller
           controllers/arm_trajectory_controller
+          controllers/gravity_compensation_controller
           controllers/chassis_controller
           controllers/gripper_controller
           controllers/lifter_controller

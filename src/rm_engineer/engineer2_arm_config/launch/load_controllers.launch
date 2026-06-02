@@ -21,6 +21,7 @@
                 controllers/robot_state_controller
                 controllers/joint_state_controller
                 controllers/arm_trajectory_controller
+                controllers/gravity_compensation_controller
                 controllers/chassis_controller
                 "
     />

@@ -1,7 +1,7 @@
 <library path="lib/libgravity_compensation_controller">
   <!-- controller_interface types -->
-  <class name="gravity_compensation_controller/GravityCompensationController"
-         type="gravity_compensation_controller::GravityCompensationController"
+  <class name="gravity_compensation_controller/GravityCompensationJointTrajectoryController"
+         type="gravity_compensation_controller::GravityCompensationJointTrajectoryController"
          base_class_type="controller_interface::ControllerBase">
     <description>
         The gravity compensation controller for robot engineer

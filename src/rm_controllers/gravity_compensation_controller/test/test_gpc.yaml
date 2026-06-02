@@ -1,0 +1,32 @@
+controllers:
+  gravity_compensation_controller:
+    type: gravity_compensation_controller/GravityCompensationJointTrajectoryController
+    joints:
+      - joint1
+      - joint2
+      - joint3
+      - joint4
+      - joint5
+      - joint6
+      - joint7
+    gains:
+      joint1: { p: 0.0, i: 0.0, d: 0.0, i_clamp_max: 20, i_clamp_min: -20, antiwindup: true, publish_state: true }
+      joint2: { p: 0.0, i: 0.0, d: 0.0, i_clamp_max: 7, i_clamp_min: -7, antiwindup: true, publish_state: true }
+      joint3: { p: 0.0, i: 0.0, d: 0.0, i_clamp_max: 0, i_clamp_min: -16, antiwindup: true, publish_state: true }
+      joint4: { p: 0.0, i: 0.0, d: 0.0, i_clamp_max: 0, i_clamp_min: -9, antiwindup: true, publish_state: true }
+      joint5: { p: 0.0, i: 0.0, d: 0.0, i_clamp_max: 2, i_clamp_min: -2, antiwindup: true, publish_state: true }
+      joint6: { p: 0.0, i: 0.0, d: 0.0, i_clamp_max: 1, i_clamp_min: -1, antiwindup: true, publish_state: true }
+      joint7: { p: 0.0, i: 0.0, d: 0.0, i_clamp_max: 2, i_clamp_min: -2, antiwindup: true, publish_state: true }
+    constraints:
+      goal_time: 5.0
+      stopped_velocity_tolerance: 0.05
+      joint1: { trajectory: 0.08, goal: 0.05 }
+      joint2: { trajectory: 0.08, goal: 0.05 }
+      joint3: { trajectory: 0.08, goal: 0.05 }
+      joint4: { trajectory: 0.08, goal: 0.05 }
+      joint5: { trajectory: 0.08, goal: 0.05 }
+      joint6: { trajectory: 0.08, goal: 0.05 }
+      joint7: { trajectory: 0.08, goal: 0.05 }
+    offset_torques: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    chain_root: base_link
+    chain_tip: gripper_link

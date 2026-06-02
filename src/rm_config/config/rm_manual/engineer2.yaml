@@ -96,8 +96,9 @@ rm_manual:
     state_controllers:
       - controllers/robot_state_controller
       - controllers/joint_state_controller
+      - controllers/gravity_compensation_controller
     main_controllers:
-      - controllers/arm_trajectory_controller
+#      - controllers/arm_trajectory_controller
       - controllers/chassis_controller
 #      - controllers/gimbal_controller
       - controllers/gripper_controller
@@ -115,7 +116,8 @@ rm_manual:
         - controllers/right_lifter_calibration_controller
       stop_controllers:
 #        - controllers/gimbal_controller
-        - controllers/arm_trajectory_controller
+#        - controllers/arm_trajectory_controller
+        - controllers/gravity_compensation_controller
         - controllers/lifter_controller
       services_name:
         - /controllers/joint1_calibration_controller/is_calibrated
